@@ -14,10 +14,15 @@
 #include <string.h>
 
 /* ---------- Array reverse (in-place) ---------- */
-void array_reverse(int *a,size_t start,size_t end) {
+/*
+   array_reverse(a, start, end)
+   - start: 起始索引（包含）
+   - end: 结束索引（包含）
+*/
+void array_reverse(int *a, size_t start, size_t end) {
     if (!a) return;
-    else if(start >= end) return;
-    size_t i = start, j = (start == 0 ? 0 : end - 1);
+    if (start >= end) return;
+    size_t i = start, j = end; // end 被视为包含的最后一个索引
     while (i < j) {
         int tmp = a[i];
         a[i] = a[j];
@@ -34,7 +39,7 @@ size_t remove_element(int *a, size_t n, int val) {
     if (!a) return 0;
     size_t write = 0;
     for (size_t read = 0; read < n; ++read) {
-        if (a[read] == val) {
+        if (a[read] != val) {
             a[write++] = a[read];
         }
     }
@@ -54,14 +59,14 @@ typedef struct {
 
 typedef struct {
     Entry *entries;
-    size_t capacity; //表示数组范围
+    size_t capacity; // 表示数组范围
 } IntMap;
- //static 为静态局部变量，外部无法读取
- //size_t 为无符号整数类型，专门用来存储内存大小 数组长度【永远非负数】
+
+// size_t 为无符号整数类型，用于存储内存大小/数组长度
 static size_t imap_next_power_of_two(size_t x) {
     size_t p = 1;
-    while (p < x) p <<= 1; //符号 <<= 为左移复合赋值运算符
-    return p;              //等价 p*=2
+    while (p < x) p <<= 1; // 等价于 p *= 2
+    return p;
 }
 
 IntMap *imap_create(size_t capacity) {
@@ -132,8 +137,8 @@ int two_sum_bruteforce(int *a, size_t n, int target, int *i_out, int *j_out) {
     for (size_t i = 0; i < n; ++i) {
         for (size_t j = i + 1; j < n; ++j) {
             if (a[i] + a[j] == target) {
-                if (i_out) *i_out = (int)i; //把为size_t类型的i和j强制转换为int类型以便输出
-                if (j_out) *j_out = (int)j; //if判断指针是否为空指针，防止输出乱值
+                if (i_out) *i_out = (int)i; // 把 size_t 转为 int 便于输出
+                if (j_out) *j_out = (int)j; // 判断指针是否为空，防止写入非法地址
                 return 1;
             }
         }
@@ -178,9 +183,9 @@ int main(void) {
     puts("Test array_reverse:");
     int arr1[] = {1,2,3,4,5};
     size_t n1 = sizeof(arr1)/sizeof(arr1[0]);
-    int st =n1/2,en=n1-1;
+    size_t st = 0, en = n1 - 1; // 反转整个数组
     printf("orig: "); print_array(arr1, n1); printf("\n");
-    array_reverse(arr1,st,en);
+    array_reverse(arr1, st, en);
     printf("reversed: "); print_array(arr1, n1); printf("\n\n");
 
     puts("Test remove_element (remove all 2s):");

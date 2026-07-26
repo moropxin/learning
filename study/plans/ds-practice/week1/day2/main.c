@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
+#include <time.h>
 
 /* ---------- Helpers ---------- */
 /*用两个函数防止运用不同排序方法时把原数组释放，
@@ -124,7 +126,6 @@ void merge_sort(int *a, size_t n) {
 */
 
 void swap(int arr[],size_t x,size_t y){
-    if(x == 0 && y == 0) return;
     int temp;
     temp = arr[x];
     arr[x] = arr[y];
@@ -132,13 +133,12 @@ void swap(int arr[],size_t x,size_t y){
 }
 
 void randomswaptohi(int arr[],size_t lo,size_t hi){
-    if(lo == 0) return;
     int random = lo + rand()%(hi - lo + 1);
     swap(arr,random,hi);
 }
 
 size_t lomuto_partition(int *a, size_t lo, size_t hi) {
-    randomswaptohi(*a,lo,hi);
+    randomswaptohi(a,lo,hi);
     int pivot = a[hi];            // 选取区间最后一个元素作为枢轴值
     size_t i = lo;                // i 指向下一个“比 pivot 小”的元素应当放置的位置
     // j 用于遍历从 lo 到 hi-1 的元素，检查哪些元素小于枢轴
@@ -218,6 +218,7 @@ void quick_sort_random(int *a, size_t n) {
 }
 /* ---------- Main: tests ---------- */
 int main(void) {
+    srand(time(NULL)); //初始化种子操作，否则运行随机效果相同
     int data[] = {1,3,4,2,6};
     size_t n = sizeof(data)/sizeof(data[0]);
 

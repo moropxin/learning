@@ -12,7 +12,7 @@
 - Day 4（栈与队列、递归）：实现数组栈、循环队列、括号匹配、练习递归分治。
 - Day 5（二叉树基础）：实现前/中/后/层序遍历（递归与迭代）。
 - Day 6（哈希/堆/图入门）：实现频率统计、简单小顶堆的插入/删除、理解 BFS/DFS。
-- Day 7（环境搭建与 Java ��体验）：在 Windows 上安装 JDK 17、IntelliJ IDEA、Git；创建第一个 Java 项目并写 HelloWorld 和字符串反转。
+- Day 7（环境搭建与 Java 体验）：在 Windows 上安装 JDK 17、IntelliJ IDEA、Git；创建第一个 Java 项目并写 HelloWorld 和字符串反转。
 
 ## 本周产出要求（Push 到 GitHub）
 - 仓库路径：study/plans/ds-practice/week1/

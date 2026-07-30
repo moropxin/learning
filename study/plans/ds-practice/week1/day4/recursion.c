@@ -1,11 +1,11 @@
 #include <stdio.h>
 
-long factorial(int n) {
+long factorial(int n) { // 阶乘之和
     if (n <= 1) return 1;
     return n * factorial(n-1);
 }
 
-int fib(int n) { // 朴素递归（可改成带备忘或迭代）
+int fib(int n) { // 斐波那契数列
     if (n <= 1) return n;
     return fib(n-1) + fib(n-2);
 }

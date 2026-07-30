@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-
+//bool类型为判断ture & false值的类型，若条件为非0值->ture，若条件为0->false
+//类似于自定义函数类型
 bool isMatching(char open, char close) {
     return (open == '(' && close == ')') ||
            (open == '[' && close == ']') ||

@@ -1,21 +1,26 @@
-# 后端agent学习计划 — Week 9
+# 后端agent学习计划 — Week 9：JavaWeb 前端基础与 HTTP
 
 ## 本周目标
-- Spring Boot 入门：理解依赖注入（DI），Controller/Service/Repository 分层模式。
-- 搭建第一个简单的 REST 服务（带 CRUD）。
+- 掌握 HTML/CSS/JS 基础（会用即可）、HTTP 协议、AJAX/JSON 前后端交互。
 
-## 每日任务（每日约 2 小时）
-- Day 1：Spring Boot 概念与项目初始化（start.spring.io）。
-- Day 2：理解 @Controller / @RestController，编写第一个控制器。
-- Day 3：Service 层与 Repository 层的职责划分。
-- Day 4：使用 Spring Data JPA（或 MyBatis）做简单的数据持久化。
-- Day 5：运行与调试 Spring Boot 应用（IDEA 配置）。
-- Day 6：写一个小型 TODO REST API（含 CRUD 与简单验证）。
-- Day 7：整理代码并写 README，准备上线部署（下周学习 Docker）。
+## 每日任务（每日约 4 小时）
+- Day 1：HTML 常用标签 + CSS 基础。
+- Day 2：JS 基础（语法、函数、DOM 操作）。
+- Day 3：HTTP 协议（请求/响应、状态码、GET/POST 区别）。
+- Day 4：AJAX + JSON 数据交互。
+- Day 5：前端综合练习（静态页面 + 简单交互）。
+- Day 6：整理 JavaWeb 知识体系笔记（前端+HTTP）。
+- Day 7（周日）：Agent 支线——Agent 工作流概念（规划/工具/记忆），读 1 篇深度文章，周复盘。
 
-## 推荐哔哩哔哩视频（优先课程/系列）
-- Spring Boot 系列课程搜索：
-  https://www.bilibili.com/search?keyword=Spring%20Boot%20教程%20系列
-- Spring Data JPA 教程搜索：
-  https://www.bilibili.com/search?keyword=Spring%20Data%20JPA%20教程
+## 本周产出要求（Push 到 GitHub）
+- 路径：study/plans/javaweb/week9/，页面 + 笔记。
 
+## 推荐哔哩哔哩视频（黑马程序员）
+- 黑马《JavaWeb开发教程》前端与 HTTP 部分：
+  https://www.bilibili.com/video/BV1m84y1w7Tb
+
+## 八股 / 面试准备
+- 每天 30 分钟：HTTP/Web 八股（状态码、GET/POST、Cookie/Session）。
+
+## 小提示
+- 前端只求「能看懂、能联调」，不要深陷 CSS/JS 细节，后端才是主线。

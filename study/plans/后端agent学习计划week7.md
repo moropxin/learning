@@ -1,21 +1,26 @@
-# 后端agent学习计划 — Week 7
+# 后端agent学习计划 — Week 7：JDBC + Maven + 综合项目
 
 ## 本周目标
-- 异常处理、I/O（文件读写）、基础并发（线程、synchronized）。
-- 学会使用 Maven/Gradle 做项目管理与依赖管理。
+- 完整掌握 JDBC（CRUD/事务/连接池），学会 Maven 工程管理，完成 Java+MySQL 综合项目。
 
-## 每日任务（每日约 2 小时）
-- Day 1：异常体系（checked/unchecked）、try-with-resources。
-- Day 2：File I/O（读取/写入文本文件）、字符编码问题。
-- Day 3：线程基础：Thread、Runnable、线程生命周期。
-- Day 4：synchronized、volatile 基础与简单并发问题分析。
-- Day 5：Maven/Gradle 入门：创建项目并添加依赖。
-- Day 6：写一个多线程的生产者-消费者示例（使用 BlockingQueue）。
-- Day 7：整理并 push，写周总结。
+## 每日任务（每日约 4 小时）
+- Day 1：JDBC 详解（DriverManager、PreparedStatement、防 SQL 注入）。
+- Day 2：事务控制 + 连接池（Druid/HikariCP）。
+- Day 3：Maven 入门（坐标、依赖、生命周期）。
+- Day 4：Maven 与 IDEA 集成，多模块概念。
+- Day 5：综合项目：学生信息管理系统（Java + Maven + MySQL，CLI）。
+- Day 6：综合项目完善（增删改查 + 查询条件 + 单元测试）。
+- Day 7（周日）：Agent 支线——用 Java 实现简单「工具调用」Demo（LLM 返回 JSON 命令 → 本地执行查询），周复盘。
 
-## 推荐哔哩哔哩视频
-- Java 并发基础课程搜索：
-  https://www.bilibili.com/search?keyword=Java%20并发%20入门%20教程
-- Maven/Gradle 教学合集：
-  https://www.bilibili.com/search?keyword=Maven%20教程
+## 本周产出要求（Push 到 GitHub）
+- 路径：study/plans/project/week7-student-manager/，项目完整可运行，写 README。
 
+## 推荐哔哩哔哩视频（黑马程序员）
+- 黑马《JavaWeb开发教程》前段 Maven/JDBC 部分：
+  https://www.bilibili.com/video/BV1m84y1w7Tb
+
+## 八股 / 面试准备
+- 每天 30 分钟：MySQL 八股背诵 + 手写 2 条重点 SQL。
+
+## 小提示
+- 综合项目是简历第一个可写项目，README 要写清楚技术栈和功能清单。

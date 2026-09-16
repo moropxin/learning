@@ -1,21 +1,25 @@
-# 后端agent学习计划 — Week 6
+# 后端agent学习计划 — Week 6：MySQL 进阶（索引 / 事务原理 / 锁）
 
 ## 本周目标
-- Java 面向对象深入（继承、多态、接口、封装、包与访问控制）。
-- 泛型与集合框架基础（List/Set/Map）
+- 理解存储引擎、索引原理、SQL 优化、锁与 MVCC，达到「会用 + 讲得出原理」水平。
 
-## 每日任务（每日约 2 小时）
-- Day 1：继承与方法重写、super 关键字。
-- Day 2：多态与接口（接口与抽象类的选择）。
-- Day 3：集合框架入门：ArrayList/LinkedList/HashMap/HashSet 基本用法。
-- Day 4：泛型与比较器（Comparator/Comparable）。
-- Day 5：Stream 简介（可选）与常见集合操作。
-- Day 6：练习题：使用集合实现词频统计并返回 TopK。
-- Day 7：整理代码并写单元测试。
+## 每日任务（每日约 4 小时）
+- Day 1：存储引擎（InnoDB / MyISAM 对比）。
+- Day 2：索引原理（B+ 树、聚簇/二级索引、覆盖索引）。
+- Day 3：索引失效场景 + EXPLAIN 分析。
+- Day 4：SQL 优化实践（慢查询定位、优化案例）。
+- Day 5：锁机制（行锁/表锁/间隙锁）+ MVCC 概念。
+- Day 6：事务隔离级别实战（脏读/不可重复读/幻读演示）。
+- Day 7（周日）：Agent 支线——Function Calling / 工具调用概念 + JSON 结构化输出，周复盘。
 
-## 推荐哔哩哔哩视频
-- Java 面向对象系统课程（合集搜索）：
-  https://www.bilibili.com/search?keyword=Java%20面向对象%20课程
-- Java 集合框架教学合集：
-  https://www.bilibili.com/search?keyword=Java%20集合%20教程
+## 本周产出要求（Push 到 GitHub）
+- 路径：study/plans/sql/week6/，实验笔记 + 优化案例。
 
+## 推荐哔哩哔哩视频（黑马程序员）
+- 黑马《MySQL数据库入门到精通》（进阶篇），运维篇可跳过。
+
+## 八股 / 面试准备
+- 每天 30 分钟：MySQL 高频八股（索引/B+树/隔离级别/锁）。
+
+## 小提示
+- 进阶篇不深抠源码，面试能讲清「为什么用 B+ 树」「隔离级别怎么实现的」即可。

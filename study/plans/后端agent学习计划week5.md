@@ -1,21 +1,26 @@
-# 后端agent学习计划 — Week 5
+# 后端agent学习计划 — Week 5：MySQL 基础
 
 ## 本周目标
-- Java 基础入门（语法、基本类型、流程控制、方法、数组与字符串）。
-- 在 Windows 上熟练使用 IntelliJ IDEA，掌握项目创建与运行。
+- 安装 MySQL，掌握 DDL/DML/DQL、约束、多表查询、事务；每天保证 SQL 练习量。
 
-## 每日任务（每日约 2 小时）
-- Day 1：JDK 与 IntelliJ 安装与配置，创建第一个 Java 项目（HelloWorld）。
-- Day 2：Java 基本语法（变量、数据类型、运算符、控制流）。
-- Day 3：方法与参数传递、数组与字符串（String API）。
-- Day 4：面向对象概念入门（类、对象、构造方法）。
-- Day 5：练习：实现字符串反转、数组去重（Java 版）。
-- Day 6：单元测试入门（JUnit5 简介与第一个测试）。
-- Day 7：整理并 push 到 GitHub，写安装与运行说明。
+## 每日任务（每日约 4 小时）
+- Day 1：MySQL 安装配置，建库建表（DDL/DML）。
+- Day 2：DQL 查询（条件/排序/分页/聚合）。
+- Day 3：多表查询（内/外连接、子查询）。
+- Day 4：约束（主键/外键/唯一/检查）与表关系设计。
+- Day 5：事务（ACID、提交/回滚）+ 简单 JDBC 连接体验。
+- Day 6：SQL 综合练习：设计订单/商品表并完成 10 道查询题。
+- Day 7（周日）：Agent 支线——继续 Java 调 LLM（多轮对话与上下文管理），周复盘。
 
-## 推荐哔哩哔哩视频（优先课程/系列）
-- IntelliJ + Java 环境安装教学合集：
-  https://www.bilibili.com/search?keyword=IntelliJ%20Java%20IDEA%20安装
-- Java 入门系统课程搜索：
-  https://www.bilibili.com/search?keyword=Java%20入门%20教程%20视频
+## 本周产出要求（Push 到 GitHub）
+- 路径：study/plans/sql/week5/，SQL 脚本 + 练习记录。
 
+## 推荐哔哩哔哩视频（黑马程序员）
+- 黑马《MySQL数据库入门到精通》（基础篇）：
+  https://www.bilibili.com/search?keyword=黑马%20MySQL数据库入门到精通
+
+## 八股 / 面试准备
+- 每天 30 分钟：Java 基础八股背诵（上阶段内容），并开始看 MySQL 基础题。
+
+## 小提示
+- SQL 一定要手敲，不要复制粘贴；建表时思考业务关系，为苍穹外卖表设计打底。

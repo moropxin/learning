@@ -1,21 +1,25 @@
-# 后端agent学习计划 — Week 8
+# 后端agent学习计划 — Week 8：阶段复盘 + 首版简历
 
 ## 本周目标
-- 数据库基础与 Java 结合：JDBC、事务、连接池基本用法。
-- 理解 HTTP/REST 基本概念，为后端开发做准备。
+- 复盘 Java+MySQL 两月成果，输出首版简历并注册好招聘渠道，为 11 月投递做准备。
 
-## 每日任务（每日约 2 小时）
-- Day 1：关系型数据库基础（表、主键、索引、基本 SQL）。
-- Day 2：安装 MySQL（或使用 Docker 运行 MySQL），学会基本增删改查。
-- Day 3：JDBC 使用，写 Java 程序连接数据库并执行 CRUD。
-- Day 4：事务与隔离级别的基础概念。
-- Day 5：连接池（HikariCP 简介）与性能注意点。
-- Day 6：HTTP/REST 基础（请求方法、状态码、JSON）。
-- Day 7：小练习：写一个用 JDBC 的简单命令行 CRUD 程序。
+## 每日任务（每日约 4 小时）
+- Day 1：Java 核心查漏（集合/并发/异常错题回顾）。
+- Day 2：MySQL 查漏（索引/事务面试题过一遍）。
+- Day 3：学生管理系统重构（分层、异常处理、代码规范）。
+- Day 4：首版简历撰写（技能栈 + 项目 + 教育背景）。
+- Day 5：简历打磨 + 注册 BOSS直聘/牛客/实习僧，完善在线简历。
+- Day 6：力扣 Java 刷题 3 道（数组/链表热题），启动算法线。
+- Day 7（周日）：Agent 支线——复盘 Agent 学习成果并整理成文档，周复盘。
+
+## 本周产出要求（Push 到 GitHub）
+- 路径：study/resume/，简历 PDF + 项目介绍文档。
 
 ## 推荐哔哩哔哩视频
-- MySQL 安装与基本使用（Windows）搜索：
-  https://www.bilibili.com/search?keyword=MySQL%20安装%20Windows
-- JDBC 教程合集搜索：
-  https://www.bilibili.com/search?keyword=JDBC%20教程
+- 简历与面试准备：https://www.bilibili.com/search?keyword=简历%20项目%20面试%20准备
 
+## 八股 / 面试准备
+- 全周每天 30 分钟：模拟面试自问自答（Java 基础 + MySQL）。
+
+## 小提示
+- 简历先出「可投递」版本即可，11 月投递后按反馈迭代；力扣每周保持 2-3 题。

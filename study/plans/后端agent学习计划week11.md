@@ -1,21 +1,28 @@
-# 后端agent学习计划 — Week 11
+# 后端agent学习计划 — Week 11：MyBatis + Spring / SpringBoot 快速入门
 
 ## 本周目标
-- Agent 概念与 LLM 基础：理解 LLM、API 调用、prompt 设计与安全性注意。
-- 在 Java 后端调用 LLM（通过 HTTP REST API）实现基础问答功能。
+- 掌握 MyBatis 持久层、Spring IOC/DI 核心思想、SpringBoot 快速上手，能写 SpringBoot + MyBatis + MySQL CRUD 接口。
 
-## 每日任务（每日约 2 小时）
-- Day 1：了解 LLM 与 Agent 的基础概念（对话管理、工具调用）。
-- Day 2：阅读主流 LLM 的 API 文档（OpenAI / 其他），注册并获取 API key（可选）。
-- Day 3：在 Spring Boot 中实现一个调用外部 HTTP API 的 Service（示例代码）。
-- Day 4：实现简单的 Chat 接口：接收用户问题，调用 LLM，返回结果并保存对话历史到 DB。
-- Day 5：实现简单的“指令解析”流程：LLM 返回结构化命令（如 JSON），后端解析并执行简单查询。
-- Day 6：添加日志与审计：对所有 LLM 调用做记录（输入/输出/成本估算）。
-- Day 7：复盘并写安全注意事项（不要把敏感数据发给第三方模型等）。
+## 每日任务（每日约 4 小时）
+- Day 1：MyBatis（Mapper XML/注解、动态 SQL）。
+- Day 2：MyBatis 关联查询与参数处理。
+- Day 3：Spring 核心概念（IOC/DI 快速理解）。
+- Day 4：SpringMVC 注解开发 + RESTful 接口。
+- Day 5：SpringBoot 快速入门（自动配置、启动器）。
+- Day 6：综合：SpringBoot + MyBatis + MySQL 简单 CRUD 接口。
+- Day 7（周日）：Agent 支线——在 SpringBoot 中封装 LLM Service（调用 API + 对话历史入库），周复盘。
 
-## 推荐哔哩哔哩视频（可作为入门了解资料）
-- LLM 与 Agent 概念入门搜索：
-  https://www.bilibili.com/search?keyword=LLM%20Agent%20入门
-- OpenAI API 使用教程（中文）：
-  https://www.bilibili.com/search?keyword=OpenAI%20API%20教程
+## 本周产出要求（Push 到 GitHub）
+- 路径：study/plans/javaweb/week11/，CRUD 接口项目。
 
+## 推荐哔哩哔哩视频（黑马程序员）
+- 黑马《JavaWeb开发教程》MyBatis/SpringBoot 部分：
+  https://www.bilibili.com/video/BV1m84y1w7Tb
+- 补充：黑马 SSM 框架教程（Spring+SpringMVC+Maven高级+SpringBoot+MyBatisPlus）：
+  https://www.bilibili.com/video/BV1Fi4y1S7ix
+
+## 八股 / 面试准备
+- 每天 30 分钟：Spring IOC/AOP 基础八股 + MyBatis 高频题。
+
+## 小提示
+- 学到这里你就具备进苍穹外卖的全部前置了，W12 起边做项目边投实习。

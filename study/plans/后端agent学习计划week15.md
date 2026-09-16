@@ -19,7 +19,8 @@
 - 苍穹外卖项目实战（收尾部分）：https://www.bilibili.com/video/BV1FSvde6EBs
 - Redis 课程（寒假深入用，本周只看缓存相关）：https://www.bilibili.com/video/BV1cr4y1671t
 
-## 八股 / 面试准备
+## 八股 / 算法 / 面试准备
+- 算法/蓝桥杯：每天 30-40 分钟，蓝桥杯真题 + 高频八股混合复习。
 - 每天 30 分钟：缓存三大问题 + 项目高频追问复盘。
 
 ## 小提示

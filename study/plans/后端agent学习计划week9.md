@@ -19,7 +19,8 @@
 - 黑马《JavaWeb开发教程》前端与 HTTP 部分：
   https://www.bilibili.com/video/BV1m84y1w7Tb
 
-## 八股 / 面试准备
+## 八股 / 算法 / 面试准备
+- 算法/蓝桥杯：每天 30-40 分钟，本周主题：栈/队列/滑动窗口（力扣 3、239、76 等）。
 - 每天 30 分钟：HTTP/Web 八股（状态码、GET/POST、Cookie/Session）。
 
 ## 小提示

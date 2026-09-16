@@ -19,7 +19,8 @@
 - 黑马《JavaWeb开发教程》Servlet/Filter 部分：
   https://www.bilibili.com/video/BV1m84y1w7Tb
 
-## 八股 / 面试准备
+## 八股 / 算法 / 面试准备
+- 算法/蓝桥杯：每天 30-40 分钟，蓝桥杯真题（简单-中档）继续推进。
 - 每天 30 分钟：Servlet/Session/Cookie/Filter 高频八股。
 
 ## 小提示

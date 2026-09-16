@@ -21,7 +21,8 @@
 - 补充：黑马 SSM 框架教程（Spring+SpringMVC+Maven高级+SpringBoot+MyBatisPlus）：
   https://www.bilibili.com/video/BV1Fi4y1S7ix
 
-## 八股 / 面试准备
+## 八股 / 算法 / 面试准备
+- 算法/蓝桥杯：每天 30-40 分钟，力扣 HOT100（数组/字符串二刷，巩固模板题）。
 - 每天 30 分钟：Spring IOC/AOP 基础八股 + MyBatis 高频题。
 
 ## 小提示

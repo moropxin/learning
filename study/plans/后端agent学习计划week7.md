@@ -19,7 +19,8 @@
 - 黑马《JavaWeb开发教程》前段 Maven/JDBC 部分：
   https://www.bilibili.com/video/BV1m84y1w7Tb
 
-## 八股 / 面试准备
+## 八股 / 算法 / 面试准备
+- 算法/蓝桥杯：每天 30-40 分钟，本周开始刷蓝桥杯真题（简单-中档，Java 提交）。
 - 每天 30 分钟：MySQL 八股背诵 + 手写 2 条重点 SQL。
 
 ## 小提示

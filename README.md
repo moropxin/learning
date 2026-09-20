@@ -68,7 +68,6 @@ gantt
 - 平台：力扣（https://leetcode.cn，HOT 100 题单）、蓝桥杯题库（https://dasai.lanqiao.cn，按年份刷真题，Java 提交）
 - 节奏：W1-W2 简单题入门 → W3-W7 数据结构主题刷题（与课程同步）→ W8-W17 真题 + HOT100 强化 → 寒假 + 3 月冲刺 → 4 月省赛
 - 报名：蓝桥杯报名窗口通常在 10-12 月，务必 11 月底前完成（留意 dasai.lanqiao.cn 通知）
-- 目录：study/plans/algorithm/weekN/（每题一个文件 + 注释 + 复杂度）
 
 ## 实习目标与节奏
 
@@ -80,4 +79,4 @@ gantt
 
 - study/plans/：每周计划 week1–week17
 - study/plans/algorithm/：力扣 + 蓝桥杯刷题代码
-- study/plans/ds-practice/：早期 C 语言数据结构练习（保留）
+- study/plans/c-practice/：早期 C 语言数据结构练习

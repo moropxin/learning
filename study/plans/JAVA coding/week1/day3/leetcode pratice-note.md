@@ -1,6 +1,6 @@
 ## LEETCODE 27 移除元素
 ### 题目思路
-    -运用快慢指针实现，快指针用于索引元素，慢指针用于存放处理后数组
+-运用快慢指针实现，快指针用于索引元素，慢指针用于存放处理后数组
 ### 代码
     class Solution {
      public int removeElement(int[] nums, int val) {

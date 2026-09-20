@@ -1,6 +1,6 @@
 ## LEETCODE 27 移除元素
 ### 题目思路
--运用快慢指针实现，快指针用于索引元素，慢指针用于存放处理后数组
+运用快慢指针实现，快指针用于索引元素，慢指针用于存放处理后数组
 ### 代码
     class Solution {
      public int removeElement(int[] nums, int val) {
@@ -53,8 +53,8 @@
 ## LEETCODE 88 合并两个有序数组
 
 ### 题目思路
-    方法一：双指针索引更新数组
-    方法二：merge-sort算法运算
+方法一：双指针索引更新数组
+方法二：merge-sort算法运算
 ### 代码
     >方法一
     class Solution {

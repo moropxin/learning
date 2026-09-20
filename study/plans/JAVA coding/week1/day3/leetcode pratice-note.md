@@ -56,7 +56,7 @@
     方法一：双指针索引更新数组
     方法二：merge-sort算法运算
 ### 代码
-  >方法一
+  方法一
 class Solution {
     public void merge(int[] nums1, int m, int[] nums2, int n) {
         int p1 = m - 1; // nums1有效末尾
@@ -77,7 +77,7 @@ class Solution {
 }
 
 
-  >方法二
+  方法二
 class Solution {
     public void merge(int[] nums1, int m, int[] nums2, int n) {
         int j = 0;

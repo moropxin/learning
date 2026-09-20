@@ -57,7 +57,7 @@
 方法二：merge-sort算法运算
 ### 代码
     >方法一
-    class Solution {
+     class Solution {
       public void merge(int[] nums1, int m, int[] nums2, int n) {
         int p1 = m - 1; // nums1有效末尾
         int p2 = n - 1; // nums2末尾

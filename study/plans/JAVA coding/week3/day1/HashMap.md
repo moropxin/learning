@@ -1,15 +1,10 @@
-# 后端agent学习计划 — Week 2：Day 5（HashMap 入门）
+# 后端agent学习计划 — HashMap 入门知识概念
 
 ## 今日目标
 - 学习 HashMap 的基本概念与使用场景
 - 理解底层结构、put/get 流程、哈希冲突与扩容
 - 完成基础代码练习与 2 道 Map 计数题
 - 记录复盘问题与学习小结，待后续 push 后自行回答
-- 预留 Java 代码书写区域，方便后续补全语法与实现
-
-## 学习时长
-- 总时长：约 3 小时
-- 结构：基础理解 + 代码练习 + 复盘小结
 
 ---
 
@@ -80,7 +75,7 @@ HashMap 的底层本质可以理解为：
 - 这时需要用链表或红黑树来解决
 
 ### 7. 扩容机制
-HashMap 在元素越来越多时，会扩容。
+HashMap 在元素越来越多时，会翻倍扩容。
 
 默认：
 - 初始容量：16
@@ -105,7 +100,7 @@ HashMap 在元素越来越多时，会扩容。
 - TreeMap：按 key 排序，适合有序场景
 
 ### 10. HashMap 的学习重点
-今天必须理解的关键点：
+
 - HashMap 用来存 key-value
 - 底层是数组 + 链表/红黑树
 - 通过 hash 定位桶
@@ -117,60 +112,42 @@ HashMap 在元素越来越多时，会扩容。
 
 ## 二、HashMap 理解要点记录
 
-请在这里写出你自己的理解，建议用自己的话表达，不要直接照抄。
 
 ### 理解要点 1：HashMap 是什么
-- 我的理解：
-- 例子：
+- 我的理解：一个用hash算法和数组以及键值key为架构支撑的快查表
 
 ### 理解要点 2：HashMap 的底层结构
-- 我的理解：
+- 我的理解：本质用数组存放map，用key查找value - ‘桶’，当出现key值不同而value相同时，会发生哈希冲突，用链表进行分支（一个桶装多个key对应的value），当数据超过8个时，hashmap会自动变为红黑树结构。
 - 关键字：数组 / 桶 / 链表 / 红黑树
 
 ### 理解要点 3：为什么能快速查找
-- 我的理解：
+- 我的理解：通过hash算法用key值快速计算得出对应下标，在数组中一次定位得到value
 - 关键字：hash / 下标 / 定位
 
 ### 理解要点 4：put/get 原理
-- 我的理解：
-- put 流程：
-- get 流程：
+- 我的理解：通过hash算法快速找到对应地址对其进行修改
+- put 流程：map.put(key,value); [放入数据]
+- get 流程：map.get(key);       [访问数据]
 
 ### 理解要点 5：哈希冲突
-- 我的理解：
-- 冲突的表现：
-- 解决方式：
+- 我的理解：不同key值通过hash算法计算得到的键值相同，产生哈希冲突
+- 冲突的表现：key不同而value相同
+- 解决方式：生成链表同时存放
 
 ### 理解要点 6：扩容
-- 我的理解：
-- 默认容量与负载因子：
-- 什么时候扩容：
+- 我的理解：数据较多，防止运行效率降低，开辟空间保证效率
+- 默认容量与负载因子：容量-[16] 负载因子-[0.75]
+- 什么时候扩容：元素数量超过[16 * 0,75]
 
 ### 理解要点 7：HashMap 的注意事项
-- key 是否重复：
-- null 是否允许：
-- 线程安全：
-- 顺序：
+- key 是否重复：唯一
+- null 是否允许：至多一个
+- 线程安全：较不安全
 
 ---
 
-## 三、今日学习任务安排（约 3 小时）
-
-### 1. HashMap 入门理解（30 分钟）
-学习目标：
-- 了解 HashMap 的概念与基本用途
-- 理解底层结构
-- 明白 put/get 的主要流程
-
-学习 checklist：
-- [ ] 了解 HashMap 是什么
-- [ ] 理解数组 + 链表/红黑树结构
-- [ ] 明白 hash 值定位桶的思想
-- [ ] 知道哈希冲突会发生什么
-- [ ] 知道扩容的作用
-
-### 2. 代码练习（45 分钟）
-目标：掌握 HashMap 的最基础使用方式。
+#代码练习
+目标：掌握 HashMap 的最基础使用方式
 
 请完成下面的 Java 代码结构：
 - 创建 HashMap
@@ -179,119 +156,125 @@ HashMap 在元素越来越多时，会扩容。
 - 处理重复 key 覆盖
 - 遍历 keySet() / entrySet()
 
-#### 代码模板（可直接在这里补全）
+#### 代码
 ```java
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Day5_HashMap {
+public class test1 {
     public static void main(String[] args) {
-        // 1. 创建 HashMap
-        Map<String, Integer> map = new HashMap<>();
+        Map<String,Integer> map = new HashMap<>(); //基本数据类型要用包装类
+        map.put("zhangsna",18);
+        map.put("lisi",19);
+        map.put("zhangsan",20);
 
-        // 2. 添加数据
+        //统计单词出现次数
+        Map<String,Integer> map3 = new HashMap<>();
+        for(String key:map.keySet()){
+            if(map3.containsValue(map.get(key))){
+                int num = map3.get(key);
+                map3.put(key,num+1);
+            }else {
+                map3.put(key,1);
+            }
+        }
+        for(String key:map.keySet()){
+            System.out.println(key+" 出现次数为:"+map3.get(key));
+        }
 
 
-        // 3. 获取数据
+        //统计字符串出现次数
+        Map<Character,Integer> map2 = new HashMap<>();
+        for(String key:map.keySet()){
+            for(int i=0;i<key.length();i++) {
+                char c = key.charAt(i);
+                if (c == ' ') {
+                    continue;
+                } else if (map2.containsKey(c)) {
+                    int num = map2.get(c);
+                    map2.put(c, num + 1);
+                } else {
+                    map2.put(c, 1);
+                }
+            }
+        }
+
+        for(Map.Entry<Character,Integer> entry:map2.entrySet()){
+            System.out.println("字符:"+entry.getKey()+" 对应次数："+entry.getValue());
+        }
+
+        //查询张三是否存在
+        if(map.get("zhangsan").equals(18)){
+            System.out.println("18岁的张三存在");
+        } else if (map.get("zhangsan").equals(20)) {
+            System.out.println("20岁的张三存在");
+        }else {
+            System.out.println("不存在");
+        }
+
+    }
+}public class test1 {
+    public static void main(String[] args) {
+        Map<String,Integer> map = new HashMap<>();
+        map.put("zhangsna",18);
+        map.put("lisi",19);
+        map.put("zhangsan",20);
+
+        //统计单词出现次数
+        Map<String,Integer> map3 = new HashMap<>();
+        for(String key:map.keySet()){
+            if(map3.containsValue(map.get(key))){
+                int num = map3.get(key);
+                map3.put(key,num+1);
+            }else {
+                map3.put(key,1);
+            }
+        }
+        for(String key:map.keySet()){
+            System.out.println(key+" 出现次数为:"+map3.get(key));
+        }
 
 
-        // 4. 重复 key 覆盖
+        //统计字符串出现次数
+        Map<Character,Integer> map2 = new HashMap<>();
+        for(String key:map.keySet()){
+            for(int i=0;i<key.length();i++) {
+                char c = key.charAt(i);
+                if (c == ' ') {
+                    continue;
+                } else if (map2.containsKey(c)) {
+                    int num = map2.get(c);
+                    map2.put(c, num + 1);
+                } else {
+                    map2.put(c, 1);
+                }
+            }
+        }
 
+        for(Map.Entry<Character,Integer> entry:map2.entrySet()){
+            System.out.println("字符:"+entry.getKey()+" 对应次数："+entry.getValue());
+        }
 
-        // 5. 遍历 keySet
-
-
-        // 6. 遍历 entrySet
-
-
-        // 7. 统计字符出现次数（可选扩展）
-
+        //查询张三是否存在
+        if(map.get("zhangsan").equals(18)){
+            System.out.println("18岁的张三存在");
+        } else if (map.get("zhangsan").equals(20)) {
+            System.out.println("20岁的张三存在");
+        }else {
+            System.out.println("不存在");
+        }
 
     }
 }
 ```
 
-### 3. put/get 流程理解（35 分钟）
-请在纸上或本 Markdown 中画出流程图，内容包括：
-- 计算 hash
-- 确定桶位置
-- 判断桶是否为空
-- 判断是否覆盖旧 value
-- 发生冲突怎么办
-- 扩容后如何重新分配
-
-建议你用下面的结构记录：
-
-#### put 流程记录
-- 步骤 1：
-- 步骤 2：
-- 步骤 3：
-- 步骤 4：
-
-#### get 流程记录
-- 步骤 1：
-- 步骤 2：
-- 步骤 3：
-- 步骤 4：
-
-### 4. 2 道基础练习题（40 分钟）
-请在这里写出 2 道基础题，并记录做题思路。
-
-#### 题目一：统计字符出现次数
-题目描述：
-- 给定字符串，例如 "aabbccddaa"
-- 统计每个字符出现的次数
-
-思路：
-- 使用 HashMap<String, Integer>
-- key 为字符，value 为次数
-
-代码练习区：
-```java
-// 题目一：字符计数
-// 请在这里补全代码
-```
-
-#### 题目二：统计数字出现次数
-题目描述：
-- 给定数组 [1, 2, 2, 3, 3, 3, 4]
-- 统计每个数字出现的次数
-
-思路：
-- 使用 HashMap<Integer, Integer>
-- key 为数字，value 为出现次数
-
-代码练习区：
-```java
-// 题目二：数字计数
-// 请在这里补全代码
-```
-
-### 5. 蓝桥杯真题 2 道（30 分钟）
-本环节暂未写，待后续补充。
+### 2. 蓝桥杯真题 2 道
 
 - 蓝桥杯真题 1：待补充
 - 蓝桥杯真题 2：待补充
 
-你可以在这里记录题目来源、题意、思路和代码：
+### 3. 复盘与口头问答
 
-#### 真题 1：
-- 题目：
-- 思路：
-- 代码：
-```java
-// 真题 1 代码区
-```
-
-#### 真题 2：
-- 题目：
-- 思路：
-- 代码：
-```java
-// 真题 2 代码区
-```
-
-### 6. 复盘与口头问答（20 分钟）
-请在 push 后自行回答以下问题，写到自己的学习笔记中。
 
 #### 复盘问题清单
 - [ ] HashMap 是什么？
@@ -303,112 +286,4 @@ public class Day5_HashMap {
 - [ ] HashMap 和 Hashtable 的区别是什么？
 - [ ] HashMap 为什么适合做计数题？
 
-### 7. 学习小结模板（10 分钟）
-请在 push 后自行填写，并保留为学习记录。
-
-#### 本日小结
-- 今天学会的关键点：
-- 最容易混淆的点：
-- 我还没完全掌握的地方：
-- 明天准备继续加强的方向：
-
-#### 自我检测
-- [ ] 我能说出 HashMap 的定义
-- [ ] 我能说出底层结构
-- [ ] 我知道 hash 冲突是怎么回事
-- [ ] 我知道扩容的作用
-- [ ] 我能写基础的 HashMap 代码
-
 ---
-
-## 四、产出模板（可直接复制使用）
-
-### 1. 学习笔记模板
-```markdown
-## Day 5：HashMap 入门学习
-### 学习目标
-- 
-
-### 学习内容
-- 
-- 
-- 
-
-### 核心知识点
-- HashMap 是：
-- 底层结构：
-- put/get：
-- 冲突：
-- 扩容：
-
-### 代码练习
-```java
-// Java 代码
-```
-
-### 复盘问题
-- 
-- 
-- 
-
-### 小结
-- 
-```
-
-### 2. Java 代码书写区（预留语法空间）
-```java
-import java.util.*;
-
-public class Day5_HashMap_Notes {
-    public static void main(String[] args) {
-        // 这里写 HashMap 相关代码
-
-
-
-
-
-    }
-}
-```
-
----
-
-## 五、今天的学习输出要求
-- 需掌握 HashMap 的基础概念
-- 能写出最基础的 key-value 存取代码
-- 能用自己的话解释 put/get、冲突和扩容
-- 能完成 2 道基础 Map 计数题
-- 记录 6、7 小段的复盘问题和学习总结
-
----
-
-## 六、建议的学习顺序
-1. 先理解 HashMap 概念
-2. 再看底层结构和 put/get 流程
-3. 之后写代码并做题
-4. 最后总结复盘问题
-
----
-
-## 七、准备 push 后自行补充的内容
-- 复盘问题答案
-- 学习小结答案
-- 蓝桥杯真题 1 & 2 的代码与说明
-- 自己对 HashMap 的完整总结
-
-注意：
-- 这份文档已为你保留足够的书写空间与复盘结构
-- 你可以在 push 后直接在对应区域补充答案
-- 不需要一次性写满，先完成理解，后续再整理
-
----
-
-## 八、学习结束后的自我检查
-- [ ] 我理解了 HashMap 是什么
-- [ ] 我理解了底层结构
-- [ ] 我理解了 put/get
-- [ ] 我理解了冲突与扩容
-- [ ] 我写过最基础的 HashMap 代码
-- [ ] 我已经记录下了复盘问题和小结问题
-
-如果你今天无法完全记住所有概念，不用焦虑。先把这份日记写完整，后面继续学 ArrayList、LinkedList、HashSet 时，HashMap 的理解会越来越清晰。

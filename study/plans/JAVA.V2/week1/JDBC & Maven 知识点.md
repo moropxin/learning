@@ -1,4 +1,4 @@
-# JDBC 与 Maven 知识点速通讲义
+# JDBC 与 Maven 知识点
 
 # 快速学习路线
 

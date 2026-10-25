@@ -170,7 +170,7 @@ Maven 有三套独立生命周期（clean、default、site），其中 default �
 
 - D\. 仅 version
 
-**6\.** JUnit 依赖一般使用的 scope 是（　）
+**6\.** JUnit 依赖一般使用的 scope 是（C）
 
 - A\. compile
 
@@ -180,7 +180,7 @@ Maven 有三套独立生命周期（clean、default、site），其中 default �
 
 - D\. runtime
 
-**7\.** 执行 mvn package 时，**不会**被触发的阶段是（　）
+**7\.** 执行 mvn package 时，**不会**被触发的阶段是（D）
 
 - A\. validate
 
@@ -204,13 +204,13 @@ Maven 有三套独立生命周期（clean、default、site），其中 default �
 
 **1\.** JDBC 释放资源时应先关闭 Connection，再关闭 Statement、ResultSet。（F）
 
-**2\.** PreparedStatement 使用参数化查询，可有效防止 SQL 注入。（R）
+**2\.** PreparedStatement 使用参数化查询，可有效防止 SQL 注入。（T）
 
-**3\.** Maven 中 provided 范围的依赖在打包时不会打入最终包。（　）
+**3\.** Maven 中 provided 范围的依赖在打包时不会打入最终包。（T）
 
-**4\.** 执行 mvn install 会把项目安装到远程仓库。（　）
+**4\.** 执行 mvn install 会把项目安装到远程仓库。（F）
 
-**5\.** JDBC URL 的标准格式为 jdbc:mysql://主机:端口/数据库名。（R）
+**5\.** JDBC URL 的标准格式为 jdbc:mysql://主机:端口/数据库名。（T）
 
 ## 代码补全题
 
@@ -243,11 +243,14 @@ try (Connection conn = ____①____.getConnection(url, "root", "123456");
 ## 简答题
 
 **1\.** 简述 JDBC 访问数据库的六步流程。
+     N1.加载驱动 N2.通过DriverManager连接MySQL N3.创建Perparestatement N4.执行SQL语句 N5.返回结果集resultset N6.关闭资源ps，st，conn.
 
 **2\.** 为什么推荐使用 PreparedStatement 而不是 Statement？
+     答：使用特定？位符转参，可防止SQL注入，运行效率更高，代码更清晰
 
 **3\.** Maven 的 scope 有哪些常见取值？分别表示什么？
-
+     complie [默认，全程有效]，test [仅作测试有效]，provide [编译，测试有效，运行不打包]，runtime [编译，运行有效，测试不打包]
+     
 ## 参考答案与解析
 
 **选择题**

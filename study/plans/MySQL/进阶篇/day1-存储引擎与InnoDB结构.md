@@ -89,7 +89,7 @@ flowchart TD
 | 类型 | 文件 | 说明 |
 | --- | --- | --- |
 | 独立表空间 | `库名/表名.ibd` | `innodb_file_per_table=ON`（默认），每表一个文件，方便单表备份/迁移 |
-| 系统表空间 | `ibdata1` | 共享，存数据字典、doublewrite buffer、change buffer 等 |
+| 系统表空间 | `ibdata1` | 共享，存 doublewrite buffer、change buffer、系统元数据（8.0 的数据字典在 `mysql.ibd`） |
 | 通用表空间 | `xxx.ibd` | 多张表共用一个文件（少用） |
 | undo 表空间 | `undo_001`… | MySQL 8 独立出来，存 undo log |
 
@@ -207,7 +207,7 @@ SHOW TABLE STATUS LIKE 't_myisam';
 
 <details><summary>3. 独立表空间和系统表空间的区别？</summary>
 
-独立表空间每张表一个 `.ibd`（`innodb_file_per_table=ON`），方便单表备份/迁移/回收空间；系统表空间 `ibdata1` 多表共享，存数据字典、doublewrite、change buffer 等。
+独立表空间每张表一个 `.ibd`（`innodb_file_per_table=ON`），方便单表备份/迁移/回收空间；系统表空间 `ibdata1` 多表共享，存 doublewrite buffer、change buffer 和系统元数据（8.0 数据字典在 `mysql.ibd`）。
 </details>
 
 <details><summary>4. MyISAM 和 InnoDB 的索引结构差异？</summary>

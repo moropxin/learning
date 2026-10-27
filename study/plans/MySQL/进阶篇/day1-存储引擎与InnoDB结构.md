@@ -193,10 +193,10 @@ SHOW TABLE STATUS LIKE 't_myisam';
 innodb，myisam，memory
 
 2. `engine_lab` 目录下各表对应哪些文件；
-innodb对应.idb文件，myisam对应.myd(数据)和.myi(索引)，memory对应.sdi(暂存)
+innodb对应.ibd文件，myisam对应.myd(数据)和.myi(索引)，memory不落盘没有数据文件
 
 3. 改引擎前后 `SHOW CREATE TABLE` 的差异。
-行限制，索引长度改变
+文件后缀从.myd/.myt变为.ibd,开始支持事务锁、外键、行锁，索引长度从非聚簇变为聚簇
 
 ## 8. 自测 6 题（先答再看）
 

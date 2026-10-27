@@ -1,4 +1,4 @@
-# 存储引擎与 InnoDB 逻辑结构（进阶篇 · W1 Day 1）
+# 存储引擎与 InnoDB 逻辑结构
 
 > 一句话：**存储引擎 = 表的「发动机」，决定数据怎么存、怎么锁、支不支持事务；InnoDB 的存储是「表空间 → 段 → 区 → 页 → 行」五层。**
 > 对应计划：W1 D1（2026-10-26）｜学完能回答：为什么默认 InnoDB、一页多大、一区多大、页里装了什么。
@@ -190,8 +190,13 @@ SHOW TABLE STATUS LIKE 't_myisam';
 
 **实验要记录的三件事**（写进笔记）：
 1. 三种引擎的 `Engine` 列分别是什么；
+innodb，myisam，memory
+
 2. `engine_lab` 目录下各表对应哪些文件；
+innodb对应.idb文件，myisam对应.myd(数据)和.myi(索引)，memory对应.sdi(暂存)
+
 3. 改引擎前后 `SHOW CREATE TABLE` 的差异。
+行限制，索引长度改变
 
 ## 8. 自测 6 题（先答再看）
 

@@ -145,44 +145,39 @@ EXPLAIN SELECT * FROM t_user WHERE id = 500;
 ### ② 造数据 + 跑 EXPLAIN（25 分钟）
 
 ```sql
-CREATE DATABASE IF NOT EXISTS idx_lab DEFAULT CHARSET utf8mb4;
-USE idx_lab;
-DROP TABLE IF EXISTS t_user;
+create database if not exists lab default charset utf8mb4;
+use lab;
 
-CREATE TABLE t_user (
-  id   BIGINT PRIMARY KEY AUTO_INCREMENT,
-  name VARCHAR(50),
-  age  INT,
-  city VARCHAR(20)
-) ENGINE = InnoDB;
+drop table if exists user;
+create table user(
+    id bigint primary key auto_increment,
+    name varchar(50),
+    age int,
+    city varchar(20)
+)engine = innodb;
 
 -- MySQL 8：递归 CTE 造 1 万行（默认递归上限 1000，先放开）
-SET SESSION cte_max_recursion_depth = 10000;
-INSERT INTO t_user (name, age, city)
-WITH RECURSIVE seq(n) AS (
-  SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 10000
-)
+set session cte_max_recursion_depth = 10000;
+insert into user(name, age, city)
+with recursive seq(n) as ( select 1 union all select n+1 from seq where n <10000)
 SELECT CONCAT('user', n), 18 + n % 50, ELT(1 + n % 4, '北京','上海','广州','深圳')
 FROM seq;
 
--- 对比 1：主键等值
-EXPLAIN SELECT * FROM t_user WHERE id = 500;              -- const
+explain select * from user where id = 500; -- type: const key:primary rows:1 extra:null
 
--- 对比 2：无索引字段
-EXPLAIN SELECT * FROM t_user WHERE name = 'user500';      -- ALL
+explain select * from user where name = 'user500'; -- type: all key:null rows:9976 extra:using where
 
-CREATE INDEX idx_name ON t_user(name);
+create index idx_name on user(name);
+explain select * from user where name = 'user500'; -- type: ref key:idx_name rows:1 extra:null
 
--- 对比 3：普通索引等值
-EXPLAIN SELECT * FROM t_user WHERE name = 'user500';      -- ref
+create index idx_age on user(age);
+explain select * from user where age between 20 and 25; -- type:range key:idx_age rows:1200 extra:using index condtion
 
-CREATE INDEX idx_age ON t_user(age);
+explain select name from user where name = 'user500'; -- type:ref key:idx_name rows:1 Extra: using index
 
--- 对比 4：范围查询
-EXPLAIN SELECT * FROM t_user WHERE age BETWEEN 20 AND 25; -- range
-
--- 对比 5：覆盖索引（只查索引里的列）
-EXPLAIN SELECT name FROM t_user WHERE name = 'user500';   -- Extra: Using index
+-- 重置index
+drop index idx_name on user;
+drop index idx_age on user;
 ```
 
 **记录 5 条结果**：type、key、rows、Extra 各是什么，写进笔记。
@@ -190,65 +185,80 @@ EXPLAIN SELECT name FROM t_user WHERE name = 'user500';   -- Extra: Using index
 ### ③ 算一算（5 分钟）
 
 如果你的表每行 200B，3 层 B+ 树大约能存多少行？写出计算过程。
+答：innodb页16kb = 16384b；bigint主键8b+页指针6b = 14b；每行200b
+    叶子页：16384b/200b = 81行/页
+    非叶子页：16384b/14b = 1170个索引项/页
+    3层B+tree：1170*1170*81 = 110880900行->约一亿行
 
 ## 8. 巩固练习（45 分钟，做完再看答案）
 
 ### A. 选择题（8 题）
 
-**1. InnoDB 索引的默认数据结构是？**
+**1. InnoDB 索引的默认数据结构是？** B
 A. 哈希表　B. B+ 树　C. B 树　D. 红黑树
 
-**2. 相比 B 树，下列不属于 B+ 树优势的是？**
+**2. 相比 B 树，下列不属于 B+ 树优势的是？** D
 A. 非叶子不存数据，扇出更大
 B. 叶子有链表，范围查询更方便
 C. 所有查询都到叶子，IO 次数稳定
 D. 支持哈希等值查询
 
-**3. 主键 `BIGINT`、每行约 1KB 时，3 层 B+ 树大约能存多少行？**
+**3. 主键 `BIGINT`、每行约 1KB 时，3 层 B+ 树大约能存多少行？** C
 A. 1 万　B. 100 万　C. 2000 万　D. 10 亿
 
-**4. 哈希索引不适合下列哪种查询？**
+**4. 哈希索引不适合下列哪种查询？** B
 A. `where id = 1`
 B. `where age between 20 and 30`
 C. `where name = 'a'`
 D. `where id in (1,2,3)`
 
-**5. InnoDB 的「自适应哈希索引」是？**
+**5. InnoDB 的「自适应哈希索引」是？** B
 A. 需要手动 `CREATE INDEX ... USING HASH`
 B. InnoDB 自动为热点页建立的
 C. MEMORY 引擎专有的
 D. InnoDB 不支持
 
-**6. B+ 树非叶子节点不存数据，最直接的好处是？**
+**6. B+ 树非叶子节点不存数据，最直接的好处是？** B
 A. 节省磁盘
 B. 一页能放更多键，扇出更大、树更矮
 C. 方便删除
 D. 减少锁冲突
 
-**7. 3 层 B+ 树，根节点不在内存，查一条记录最多几次磁盘 IO？**
+**7. 3 层 B+ 树，根节点不在内存，查一条记录最多几次磁盘 IO？** C
 A. 1　B. 2　C. 3　D. 4
 
-**8. B+ 树的叶子节点之间用什么连接？**
+**8. B+ 树的叶子节点之间用什么连接？** B
 A. 单链表　B. 双向链表　C. 数组　D. 红黑树
 
 ### B. 判断题（5 题）
 
-1. B+ 树的所有数据都存放在叶子节点。（　）
-2. 哈希索引可以支持 `order by` 排序。（　）
-3. InnoDB 可以用 `CREATE INDEX ... USING HASH` 显式创建哈希索引。（　）
-4. 树高越低，查询需要的磁盘 IO 越少，查询越快。（　）
-5. InnoDB 中，主键索引就是聚簇索引。（　）
+1. B+ 树的所有数据都存放在叶子节点。（T）
+2. 哈希索引可以支持 `order by` 排序。（F）
+3. InnoDB 可以用 `CREATE INDEX ... USING HASH` 显式创建哈希索引。（F）
+4. 树高越低，查询需要的磁盘 IO 越少，查询越快。（T）
+5. InnoDB 中，主键索引就是聚簇索引。（T）
 
 ### C. 简答题（3 题）
 
 1. 为什么 MySQL 选 B+ 树，而不是 B 树？
+答：只用双向链表链接数据，非数据节点做索引项，扇开更大，层数更少，优化IO。
+
 2. 为什么不用红黑树做索引？
+答：特殊情况会出现全扫描情况，IO大，不稳定。
+
 3. 哈希索引适合什么场景？不适合什么场景？
+答：适合仅做单次查询情况,IO仅为1，不适合范围查询和条件查询。
 
 ### D. 计算题（2 题）
 
 1. 页大小 16KB，主键 8B，子页指针 6B，忽略页头开销，一个非叶子页大约能放多少个键？
-2. 每行 200B，扇出按 1170 算，3 层 B+ 树大约能存多少行？
+答：页大小为16384b，键项总和14b
+    非叶子页：16384b/14b = 1170键/页
+
+3. 每行 200B，扇出按 1170 算，3 层 B+ 树大约能存多少行？
+答：页大小为16384b
+    叶子页：16384b/200b = 81页/行
+    1170*1170*81=1亿
 
 <details><summary><b>答案与解析（先做完再点开）</b></summary>
 

@@ -127,28 +127,55 @@ where name = 'user500'
 ## 7. 动手实验（40 分钟）
 
 ```sql
-CREATE DATABASE IF NOT EXISTS idx_lab2 DEFAULT CHARSET utf8mb4;
-USE idx_lab2;
-DROP TABLE IF EXISTS t_user;
+create database if not exists lab2 default charset utf8mb4;
+use lab2;
 
-CREATE TABLE t_user (
-  id   BIGINT PRIMARY KEY AUTO_INCREMENT,
-  name VARCHAR(50),
-  age  INT,
-  city VARCHAR(20),
-  memo VARCHAR(100)
-) ENGINE = InnoDB;
+drop table if exists user;
 
-SET SESSION cte_max_recursion_depth = 10000;
-INSERT INTO t_user (name, age, city, memo)
-WITH RECURSIVE seq(n) AS (
-  SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 10000
-)
-SELECT CONCAT('user', n), 18 + n % 50, ELT(1 + n % 4, '北京','上海','广州','深圳'), 'memo'
+create table user(
+    id bigint primary key auto_increment, -- 设置为主键，作为索引
+    name varchar(50),
+    age int,
+    city varchar(20),
+    memo varchar(100)
+)engine = innodb;
+
+-- insert into……select 为动态插入语句
+set session cte_max_recursion_depth = 10000; -- session 只对当前数据库生效 cte 递归深度 【当前语句为修改递归深度】
+insert into user(name, age, city, memo) -- 把后面 select 查出来的每一行，插入到 user 表的 `name,age,city,memo` 这四个字段
+with recursive seq(n) as( -- seq为结果集，相当于数组
+    select 1 union all select n+1 from seq where n < 10000
+)-- |锚点成员1|              递归部分           |    停止条件   |
+SELECT CONCAT('user', n), 18 + n % 50, ELT(1 + n % 4, '北京','上海','广州','深圳'), 'memo' -- 生成每一条字段值
 FROM seq;
 
-CREATE INDEX idx_name     ON t_user(name);
-CREATE INDEX idx_age_city ON t_user(age, city);
+create index idx_name on user(name); -- 单列索引
+create index idx_age_city on user(age,city); -- 联合索引
+
+
+-- 1. ref  idx_name 203 null
+explain select * from user where name = 'user500'; -- 回表（无Using index）
+
+-- 2. ref idx_name 203 using index
+explain select name from user where name = 'user500';  --  覆盖(using index)
+
+-- 3. ref idx_name 203 using index
+explain select id,name from user where name = 'user500'; -- 覆盖(id在叶子里)
+
+-- 4. ref idx_age_city 200 null
+explain select * from user where age =20; -- 联合索引最左列
+
+-- 5. all null null using where
+explain select * from user where city = '北京'; -- 跳过最左列 -> all
+
+-- 6. ref idx_age_city 88 null
+explain select * from user where age = 20 and city = '北京'; -- 两列都用上（key——len变长）
+
+-- 7. all null null using where
+explain select * from user where age > 20 and city = '北京'; -- range + 索引下推[city定位失效]
+
+-- 8. ref idx_age_city 5 using index
+explain select age,city from user where age = 20; -- 覆盖（联合索引叶子含age/city/id，不用回表）
 ```
 
 逐条跑，把 `type / key / key_len / Extra` 填进表里：
@@ -166,62 +193,81 @@ CREATE INDEX idx_age_city ON t_user(age, city);
 
 **要记录的三件事**：
 1. 第 2、3 条和第 1 条的 `Extra` 差在哪；
+答：第一条是null，2、3条为using index
+
 2. 第 5 条为什么 `key` 是 NULL；
+答：因为最左列不是连续的，只要断开就无法形成联合索引，后续都视为查询条件
+
 3. 第 6 条和第 4 条的 `key_len` 差多少（说明两列都用上了）。
+答：差112长度，第六条city列索引也用上了
 
 ## 8. 巩固练习（45 分钟，做完再看答案）
 
 ### A. 选择题（8 题）
 
-**1. InnoDB 聚簇索引的叶子节点存什么？**
+**1. InnoDB 聚簇索引的叶子节点存什么？** B
 A. 主键值　B. 整行数据　C. 行地址　D. 索引列
 
-**2. 二级索引的叶子节点存什么？**
+**2. 二级索引的叶子节点存什么？** B
 A. 整行数据　B. 索引列 + 主键值　C. 行地址　D. 页号
 
-**3. 一张 InnoDB 表最多有几个聚簇索引？**
+**3. 一张 InnoDB 表最多有几个聚簇索引？** B
 A. 0 个　B. 1 个　C. 2 个　D. 每个索引一个
 
-**4. 下列哪条一定是覆盖索引？**（表有 `idx_name(name)`，主键 id）
+**4. 下列哪条一定是覆盖索引？**（表有 `idx_name(name)`，主键 id） B
 A. `select * from t where name='x'`
 B. `select name from t where name='x'`
 C. `select age from t where name='x'`
 D. `select * from t`
 
-**5. 联合索引 `(a,b,c)`，`where b=2` 能走索引吗？**
+**5. 联合索引 `(a,b,c)`，`where b=2` 能走索引吗？** B
 A. 能，走全索引　B. 不能，跳过最左列　C. 只能用 c　D. 只能全表扫
 
-**6. 联合索引 `(a,b,c)`，`where a=1 and c=3` 能用上几列定位？**
+**6. 联合索引 `(a,b,c)`，`where a=1 and c=3` 能用上几列定位？** B
 A. 0　B. 1　C. 2　D. 3
 
-**7. 回表发生在什么之后？**
+**7. 回表发生在什么之后？** B
 A. 聚簇索引查完　B. 二级索引查到主键之后　C. 全表扫描之后　D. 覆盖索引之后
 
-**8. `Extra: Using index` 表示？**
+**8. `Extra: Using index` 表示？** B
 A. 用了索引下推　B. 覆盖索引，不用回表　C. 用了主键　D. 索引失效
 
 ### B. 判断题（5 题）
 
-1. 二级索引的叶子存的是行地址。（　）
-2. 一张表可以有多个二级索引。（　）
-3. 联合索引 `(a,b,c)` 查 `c=3` 也能用上索引。（　）
-4. 覆盖索引可以避免回表。（　）
-5. 主键越长，二级索引占的空间越大。（　）
+1. 二级索引的叶子存的是行地址。（F）
+2. 一张表可以有多个二级索引。（T）
+3. 联合索引 `(a,b,c)` 查 `c=3` 也能用上索引。（F）
+4. 覆盖索引可以避免回表。（T）
+5. 主键越长，二级索引占的空间越大。（T）
 
 ### C. 简答题（3 题）
 
 1. 什么是回表？有哪两种常见方式避免？
+答：当二级查询查找到叶子页的索引值后返回主表根据索引值查找相应叶子数据，这个过程叫回表。
+采用覆盖索引或联合索引可有效避免
+
 2. 最左前缀原则是什么？举一个「用不上」的例子。
+答：先按左排序，左条件相同后向后迭代条件。
+例：当最左条件为范围查询时，后面的迭代条件作废，退化为查询条件
+
 3. 为什么建议用自增主键，而不是 UUID？
+答：因为主键有序自增，依次向右插入，索引IO次数更少。UUID为随机增加，无序插入，索引IO次数膨胀。
 
 ### D. SQL 分析题（4 题，表结构同上）
 
 > 表 `t_user(id 主键, name, age, city, memo)`，索引：`idx_name(name)`、`idx_age_city(age, city)`。判断 type、是否回表、Extra 大概是什么。
 
 1. `select * from t_user where name = 'user500';`
+type:ref  状态:回表  Extra:null
+
 2. `select id, name from t_user where name = 'user500';`
+type:ref  状态:无需回表  Extra:null
+
 3. `select * from t_user where city = '北京';`
+type:all  状态:回表  Extra:where
+
 4. `select * from t_user where age = 20 and city = '北京';`
+type:ref  状态:无需回表  Extra:using index
 
 <details><summary><b>答案与解析（先做完再点开）</b></summary>
 

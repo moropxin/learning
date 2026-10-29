@@ -194,7 +194,8 @@ drop index idx_age on user;
 
 ### A. 选择题（8 题）
 
-**1. InnoDB 索引的默认数据结构是？** B
+**1. InnoDB 索引的默认数据结构是？** 
+B
 A. 哈希表　B. B+ 树　C. B 树　D. 红黑树
 
 **2. 相比 B 树，下列不属于 B+ 树优势的是？** D

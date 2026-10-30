@@ -230,7 +230,7 @@ EXPLAIN SELECT * FROM t_idx WHERE age = 20 ORDER BY name;
 
 | # | 场景 | type | key | key_len | rows | Extra |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | S1 隐式转换 | | | | | |
+| 1 | S1 隐式转换 | all/ref | primary/idx_phone | 8/82 | 1 | null |
 | 2 | S2 前导模糊 | | | | | |
 | 3 | S3 列运算 | | | | | |
 | 4 | S4 列函数 | | | | | |
@@ -246,71 +246,74 @@ EXPLAIN SELECT * FROM t_idx WHERE age = 20 ORDER BY name;
 > 表 `t_idx`：`phone varchar` 有索引、`age int` 有索引、`name varchar` 有索引、`create_time datetime` 无索引、`(age, city)` 联合索引。
 
 **1.** `where phone = '13800000100'`
-> 答：
+> 答：走，字符串形式与列形式相同直接走索引
 
 **2.** `where phone = 13800000100`
-> 答：
+> 答：不走，列隐式转换为数字，走全表扫描
 
 **3.** `where age = '20'`
-> 答：
+> 答：走，隐式转换为数字，而age列为常量，索引生效
 
 **4.** `where name like 'user50%'`
-> 答：
+> 答：走，前缀模糊查询相当于range
 
 **5.** `where name like '%user50'`
-> 答：
+> 答：不走，占位符在前导查询，无法二分
 
 **6.** `where city = '北京'`（单独查）
-> 答：
+> 答：不走，前导索引失效
 
 **7.** `where age = 20 and city = '北京'`
-> 答：
+> 答：走，与联合索引的顺序相同
 
 **8.** `where age = 20 and memo = 'x'`
-> 答：
+> 答：走 ref + using where，age有索引可走，memo没有索引，做过滤条件，改为合并查询可优化
 
 ### B. 选择题（4 题）
 
 **1. `key_len` 变大说明什么？**
 A. 索引更多　B. 联合索引用到了更多列　C. 数据量变大　D. 回表次数变多
-> 答：
+> 答：B
 
 **2. `Extra: Using filesort` 表示？**
 A. 排序走了索引　B. 排序没走索引，要额外排序　C. 用了临时表　D. 覆盖索引
-> 答：
+> 答：B
 
 **3. 下列**不是**索引失效原因的是？**
 A. 对索引列使用函数　B. 字符串列不加引号　C. `is null` 查询　D. 前导模糊查询
-> 答：
+> 答：D
 
 **4. `possible_keys` 有值、`key` 却是 NULL，最可能的原因？**
 A. 索引坏了　B. 优化器认为全表扫描更便宜　C. 表太小没有索引　D. 字符集问题
-> 答：
+> 答：B
 
 ### C. 简答题（3 题）
 
 **1. 拿到一条慢 SQL，你用哪几步判断它有没有走索引？**
 > 答：
->
+>    查询时间是否过长，用explain语句查询key值是否为null
 >
 
 **2. 深分页 `limit 1000000, 10` 为什么慢？怎么优化？**
 > 答：
->
+>     数据量大，生成B+TREE分支耗费时间，使用覆盖索引
 >
 
 **3. 一条 SQL 明明走了索引（type=ref），但还是慢，可能是什么原因？**
 > 答：
->
+>    排序没有走索引，查询语句有order by，重新创建索引
 >
 
 ### D. 改写题（2 题：把失效 SQL 改成能走索引的写法）
 
 **1.** `select * from t_idx where date(create_time) = '2026-10-30' and age = 20;`
-> 答：
+> 答：select * from t_idx where
+>     create_time >= '2026-10-30' and create_time < '2026-10-31' and age = 20;
 
 **2.** `select * from t_idx where name = 'user500' or memo like '%x%';`
-> 答：
+> 答：select * from t_idx where name = 'user500'
+>     union
+>     select * from t_idx where memo like '%x%';
 
 <details><summary><b>参考答案（先写满答题区再点开）</b></summary>
 

@@ -70,10 +70,10 @@ ALTER TABLE t_demo ENGINE = InnoDB;
 
 ```mermaid
 flowchart TD
-    TS["表空间 Tablespace<br/>.ibd / ibdata1"] --> SG["段 Segment<br/>数据段 / 索引段 / 回滚段"]
-    SG --> EX["区 Extent<br/>1MB = 64 个页（物理连续）"]
-    EX --> PG["页 Page<br/>16KB（读写的最小单位）"]
-    PG --> RW["行 Row<br/>DYNAMIC / COMPACT 行格式"]
+    TS["表空间<br/>Tablespace"] --> SG["段<br/>Segment"]
+    SG --> EX["区<br/>Extent"]
+    EX --> PG["页<br/>Page"]
+    PG --> RW["行<br/>Row"]
 ```
 
 | 层级 | 是什么 | 关键数字 / 一句话 |

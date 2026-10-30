@@ -95,21 +95,21 @@ SELECT @@optimizer_switch;
 
 ```mermaid
 flowchart TD
-    A["SQL 里的过滤条件"] --> B{"这一列有索引吗"}
-    B -->|没有| X1["全表扫描"]
-    B -->|有| C{"是不是联合索引的最左列"}
-    C -->|不是| X2["用不上（断在最左）"]
-    C -->|是| D{"列上有没有函数或运算"}
+    A["过滤条件"] --> B{"有索引?"}
+    B -->|无| X1["全表扫描"]
+    B -->|有| C{"在最左?"}
+    C -->|否| X2["断在最左"]
+    C -->|是| D{"列上有运算?"}
     D -->|有| X3["失效"]
-    D -->|没有| E{"列和常量的类型/字符集一致吗"}
-    E -->|不一致| X4["隐式转换 → 失效"]
-    E -->|一致| F{"like 是不是前导 %"}
+    D -->|无| E{"类型一致?"}
+    E -->|否| X4["隐式转换"]
+    E -->|是| F{"前导 %?"}
     F -->|是| X5["失效"]
-    F -->|不是| G{"or 里有没有无索引列"}
-    G -->|有| X6["整体退化成全表"]
-    G -->|没有| H{"优化器认为回表太贵吗"}
-    H -->|是| X7["主动放弃索引"]
-    H -->|否| OK["✅ 走索引"]
+    F -->|否| G{"or 有裸列?"}
+    G -->|有| X6["退化成全表"]
+    G -->|无| H{"优化器嫌贵?"}
+    H -->|是| X7["放弃索引"]
+    H -->|否| OK["走索引 ✅"]
 ```
 
 ## 5. 八个失效场景（每个都要有 EXPLAIN 证据）
@@ -231,13 +231,34 @@ EXPLAIN SELECT * FROM t_idx WHERE age = 20 ORDER BY name;
 | # | 场景 | type | key | key_len | rows | Extra |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | S1 隐式转换 | all/ref | primary/idx_phone | 8/82 | 1 | null |
-| 2 | S2 前导模糊 | | | | | |
-| 3 | S3 列运算 | | | | | |
-| 4 | S4 列函数 | | | | | |
-| 5 | S5 跳最左 | | | | | |
-| 6 | S6 范围后 | | | | | |
-| 7 | S7 or 裸列 | | | | | |
-| 8 | S8 低区分度 | | | | | |
+| 2 | S2 前导模糊 | all | null | null | 9864 | Using where |
+| 3 | S3 列运算 | all | null | null | 9864 | Using where |
+| 4 | S4 列函数 | all | null | null | 9864 | Using where |
+| 5 | S5 跳最左 | all | null | null | 9864 | Using where |
+| 6 | S6 范围后 | range | idx_age_city | 86 | 200 | Using index condition |
+| 7 | S7 or 裸列 | all | null | null | 9864 | Using where |
+| 8 | S8 低区分度 | ref | idx_gender | 1 | 5000 | null |
+
+**对照组（同一天实测，用来看清"失效"和"有效"差在哪）**
+
+| 场景 | 写法 | type | key | key_len | rows | Extra |
+| --- | --- | --- | --- | --- | --- | --- |
+| S2 对照 | `like 'user50%'` | range | idx_name | 202 | 111 | Using index condition |
+| S4 对照 | `create_time >= … and < …` | range | idx_age_city | 4 | 200 | null |
+| S5 对照 | `age = 20` | ref | idx_age_city | 4 | 200 | null |
+| S5 对照 | `age = 20 and city = '北京'` | ref | idx_age_city | 86 | 100 | null |
+| 覆盖索引 | `select age, city where age = 20` | ref | idx_age_city | 4 | 200 | Using index |
+| 排序 | `order by name` | ref | idx_age_city | 4 | 200 | Using filesort（356 ms） |
+
+**从这张表能读出的 3 件事**
+
+1. `rows = 9864` 出现 5 次（全表就这么大）→ `type = all` 等于把整张表读一遍，`rows` 越大越慢。
+2. 同一个 `(age, city)` 索引：只用 `age` → `key_len = 4`；两列都用 → `86`；`city` 变范围后 → 仍停在 `86`，说明**后面的列只能当过滤条件**。
+3. **S8 其实没有"失效"**：`gender = 1` 仍是 `ref + idx_gender`，但 `rows = 5000`，意味着一半的行要回表。优化器算代价后仍选了索引 —— 所以"低区分度"≠ 立刻放弃，得用 `EXPLAIN ANALYZE` 比真实耗时才能下结论。
+
+> ⚠️ 两条记录建议复核（练"证据意识"，不是挑错）：
+> - **S4 对照**那行 `key = idx_age_city`：`create_time` 上没索引，优化器不可能对 `age` 走 `range`。可能当时 SQL 里带了 `age` 条件，或抄串了行 → 重跑 `EXPLAIN FORMAT=JSON` 看 `access_type`。
+> - **S6** 那行 `Extra = Using index condition`：ICP 只对**索引内的列**下推，`memo` 不在索引里，理论上不该出现 → 确认一下是不是 `Using where`。
 
 ## 7. 练习（35 分钟，直接在答题区写）
 
@@ -374,3 +395,13 @@ EXPLAIN 五列：type（ALL=没走）、key（NULL=没用）、key_len（几列�
 >
 > **索引失效的常见原因？**
 > 在索引列上做函数或运算、隐式类型转换（字符串列传数字）、联合索引不满足最左前缀、`like '%x'` 前导模糊、`or` 连接了无索引列，以及数据区分度太低导致优化器主动放弃索引。
+
+---
+
+## 附：批改备注（10/31）
+
+> 你提交的作答整体很稳（判断 8/8，选择 3/4），下面三处值得回看：
+
+1. **选择 B3 答成了 D，正确答案是 C（`is null`）**。`is null` 在 InnoDB 里**可以**走索引（索引叶子记录 NULL）；"前导模糊"本身就是失效原因之一，所以 D 不能选。
+2. **判断 A6 的原因写成了"前导索引失效"**：`where city = '北京'` 不走索引，是因为 `city` 不是联合索引 `(age, city)` 的**最左列**（断在最左），跟"前导模糊"没关系，两个术语别混。
+3. **A3 的表述再准一点**：`age = '20'` 能走索引，是因为**常量**被转成数字，**列本身没被转换**。

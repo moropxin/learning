@@ -195,79 +195,80 @@ EXPLAIN SELECT DATE(create_time), COUNT(*) FROM t_opt GROUP BY DATE(create_time)
 
 | 实验 | SQL | type | key | Extra | 耗时 |
 | --- | --- | --- | --- | --- | --- |
-| A① | 单条插入 | | | | |
-| A③ | INSERT…SELECT 1 万行 | | | | |
-| B | 顺序主键 10 万行 | | | | |
-| B | UUID 主键 10 万行 | | | | |
-| C | `order by create_time` | | | | |
-| C | `order by name` | | | | |
-| D | `group by status` | | | | |
-| D | `group by DATE(...)` | | | | |
+| A① | 单条插入 | all | null | null | 362ms|
+| A③ | INSERT…SELECT 1 万行 | all | null | null | 341ms |
+| B | 顺序主键 10 万行 | all | null | null | 353ms|
+| B | UUID 主键 10 万行 | all | null | null | 360ms |
+| C | `order by create_time` | ref | idx_status_ct | null | 355ms |
+| C | `order by name` | ref | idx_status_ct | Using filesort | 353ms |
+| D | `group by status` | index | idx_status_ct | Using index | 351ms |
+| D | `group by DATE(...)` | index | idx_status_ct | Using index & Using temporary | 375ms |
 
 ## 6. 练习（35 分钟，直接写答题区）
 
 ### A. 判断题（6 题）
 
 **1.** 一条 `INSERT` 带 1000 个 `values`，通常比 1000 条单行 `INSERT` 快。
-> 答：
+> 答：对，无须1000次往返和解析
 
 **2.** 主键用 UUID 更好，因为全局唯一、不冲突。
-> 答：
+> 答：错，值落在页中，会频繁页分裂，表长更长，应该用雪花ID
 
 **3.** 只要 `order by` 的列上建了索引，就一定能消除 `Using filesort`。
-> 答：
+> 答：错，需要where与前序列等值，order by后和索引方向、顺序一致
 
 **4.** MySQL 8.0 里 `group by` 还会隐式排序，所以要加 `order by null` 优化。
-> 答：
+> 答：错，8.0已经没有隐式排序了，5.7版本取消了此优化
 
 **5.** 大批量导入时可以临时关闭唯一性检查，导完再打开。
-> 答：
+> 答：对，把`SET UNIQUE_CHECKS=0; SET FOREIGN_KEY_CHECKS=0;`执行可省略多次效验，导完要将其重新置为1
 
 **6.** 二级索引建得越多，插入速度越快。
-> 答：
+> 答：错，二级索引跟着B+TREE创建，数据会糅杂
 
 ### B. 选择题（4 题）
 
 **1. 导入 100 万行数据，最快的是？**
 A. 循环单条 INSERT　B. 批量 INSERT + 手动事务　C. `LOAD DATA LOCAL INFILE`　D. 建满索引再插
-> 答：
+> 答：C
 
 **2. `Extra: Using filesort` 表示？**
 A. 排序走了索引　B. 需要额外排序，索引没帮上忙　C. 用了临时表　D. 覆盖索引
-> 答：
+> 答：B
 
 **3. 下列**最不适合**做主键的是？**
 A. `BIGINT AUTO_INCREMENT`　B. `UUID` 字符串　C. 雪花 ID　D. `INT UNSIGNED AUTO_INCREMENT`
-> 答：
+> 答：B
 
 **4. `group by` 出现 `Using temporary` 说明？**
 A. 分组走了索引　B. 分组用上了临时表　C. 用了覆盖索引　D. 没有索引
-> 答：
+> 答：B
 
 ### C. 简答题（3 题）
 
 **1. 批量导入数据，你会做哪 4 件事提速？**
 > 答：
->
->
+> N1.批量"values" N2.关闭自动事务、手动提交，减少校验
+> N3.导入期间将数据唯一性、外键关联性检查关闭 N4.数据量大用‘load data’
 
 **2. `order by` 想用上索引排序，需要满足哪 3 个条件？**
 > 答：
->
+> where条件要为等值条件，order by后置索引要跟前置顺序、排序方向一致
 >
 
 **3. 主键为什么建议「短 + 顺序」？分别从索引大小和页分裂两个角度说。**
 > 答：
->
->
+>短值索引小，聚簇索引存短值索引可以防止二级索引“ 索引列+主键 ”因存入长值索引导致行变长，存放索引列变短导致树深增加
+>顺序索引自增值只在尾端插入，不会出现页分裂；随机值插到中间页，页满要搬一半数据，插入变慢且碎片多
+
 
 ### D. 改写题（2 题）
 
 **1.** `select * from t_opt where date(create_time) = '2026-10-30' order by create_time;`
-> 答：
+> 答：select * from t_opt where create_time >= '2026-10-30' and create_time < '2026-10-31' order by create_time
 
 **2.** `select id, name from t_opt where status = 1 order by name;`（当前只有 `idx_status_ct`，出现 filesort）
-> 答：
+> 答：alter table t_opt add index idx_status_name (status,name);建联合索引和id主       键一起走覆盖查询
 
 <details><summary><b>参考答案（先写满答题区再点开）</b></summary>
 

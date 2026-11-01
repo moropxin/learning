@@ -189,78 +189,78 @@ LIMIT 10;
 
 | 场景 | 写法 | type / key | 耗时（ms） | 备注 |
 | --- | --- | --- | --- | --- |
-| 深分页 | 原始 `limit 90000,10` | | | |
-| 深分页 | 延迟关联 | | | |
-| 深分页 | 书签 `id > 90000` | | | |
-| count | `count(*)` | | | |
-| count | `count(memo)` | | | |
-| update | `where name`（有索引） | | | 锁了几行 |
-| update | `where memo`（无索引） | | | 锁了几行 |
+| 深分页 | 原始 `limit 90000,10` | index / primary | 342ms | null |
+| 深分页 | 延迟关联 | index、eq_ref / primary | 334ms | using index |
+| 深分页 | 书签 `id > 90000` | range / primary | 354ms | using where |
+| count | `count(*)` | index / idx_status_ct | 347ms | using index |
+| count | `count(memo)` | all / null | 334ms | null |
+| update | `where name`（有索引） | range | 13ms | 1 |
+| update | `where memo`（无索引） | index | 19ms | 9892 |
 
 ## 6. 练习（35 分钟，直接写答题区）
 
 ### A. 判断题（6 题）
 
 **1.** `limit 100000, 10` 会直接跳到第 10 万行开始读。
-> 答：
+> 答：错，要全表扫描到offerset，扫描到100000行再开始读10行数进行回表
 
 **2.** 延迟关联之所以快，是因为子查询只读索引、不用回表。
-> 答：
+> 答：对，子查询只查‘id'，走覆盖索引无需回表
 
 **3.** `count(*)` 比 `count(列)` 慢，因为要读整行。
-> 答：
+> 答：错，count(*)可直接根据最短二级索引读行，而count(列)里可null时还需逐行校验
 
 **4.** InnoDB 不缓存总行数，是因为 MVCC 让不同事务看到不同行数。
-> 答：
+> 答：对，myisam存整行数
 
 **5.** `update ... where 无索引列` 会锁全表。
-> 答：
+> 答：对，全表扫描到所有行，RR锁+间隙锁自动全上锁
 
 **6.** `long_query_time` 默认是 1 秒。
-> 答：
+> 答： 错，默认是十秒，大量慢数据无法记录，需要手动调整为1、0.5s
 
 ### B. 选择题（4 题）
 
 **1. 深分页最适合的通用改法是？**
 A. 加 `limit` 调大　B. 延迟关联（先用覆盖索引取 id 再 join）　C. 加 `order by rand()`　D. 改 `count(*)`
-> 答：
+> 答：B
 
 **2. 想"大概知道表有多少行"，最快的办法是？**
 A. `count(*)`　B. `SHOW TABLE STATUS` 的 `Rows`　C. `count(主键)`　D. 遍历全表
-> 答：
+> 答：B
 
 **3. `update` 时最危险的条件是？**
 A. 主键等值　B. 唯一索引等值　C. 无索引列　D. 普通索引等值
-> 答：
+> 答：C
 
 **4. 8.0 里查"哪条 SQL 总耗时最高"，推荐用？**
 A. `SHOW PROFILE`　B. `performance_schema.events_statements_summary_by_digest`　C. `SHOW PROCESSLIST`　D. `EXPLAIN`
-> 答：
+> 答：B
 
 ### C. 简答题（3 题）
 
 **1. 深分页为什么慢？写出两种优化写法并说明各自的限制。**
-> 答：
->
->
+> 答：需要全表扫描并回表，效率倍数增长
+> 延迟关联:子查询先不回表定位到开始索引，再开始读表
+> 书签：通过范围查询定位到上一页的最后索引，再开始读表
 
 **2. 为什么 InnoDB 的 `count(*)` 不能像 MyISAM 一样 O(1)？**
-> 答：
->
+> 答：innodb不缓存总行数，支持MVCC，隐式存储不同表的行数，读全行需二级索引辅助查询，  
+> myisam缓存总行数，无需二次定位
 >
 
 **3. 一条 update 把线上锁住了，你怎么排查？**
-> 答：
->
->
+> 答：①`SHOW PROCESSLIST` 看是否有长事务/大量 `Waiting for lock`；               > ②`performance_schema.data_locks` / `data_lock_waits` 看锁了哪些行、谁在等谁；   > ③`EXPLAIN` 该 update 的 where 条件，确认是否走索引；
+> ④确认事务隔离级别（RR 间隙锁 > 更容易冲突）；
+> ⑤`information_schema.innodb_trx` 看事务年龄，必要时 kill 长事务（慎）。   
 
 ### D. 改写题（2 题）
 
 **1.** `select * from t_opt order by id limit 500000, 20;`
-> 答：
+> 答：select * from t_opt where id > 500000 order by id limit 20;
 
 **2.** `update t_opt set memo = 'x' where memo = 'memo-1';`
-> 答：
+> 答：先给memo建索引alter table t_opt add index idx_memo(memo)
 
 <details><summary><b>参考答案（先写满答题区再点开）</b></summary>
 

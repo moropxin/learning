@@ -299,8 +299,8 @@ ROLLBACK;
 
 | 实验 | 条件 | 索引 | TABLE 锁 | RECORD 锁条数 | LOCK_MODE | 结论 |
 | --- | --- | --- | --- | --- | --- | --- |
-| A | `name='b'` | 唯一 | | | | |
-| B | `age=20` | 普通 | | | | |
+| A | `name='b'` | 唯一 | record | 2 | REC_NOT_GAP | |
+| B | `age=20` | 普通 | | 4 |GAP\REC_NOT_GAP | |
 | C | `age between 10 and 30` | 普通 | | | | |
 | D | `memo='m1'` | 无 | | | | |
 | E | `age=20`（RC） | 普通 | | | | |

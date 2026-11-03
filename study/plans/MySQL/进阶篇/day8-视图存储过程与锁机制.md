@@ -301,9 +301,9 @@ ROLLBACK;
 | --- | --- | --- | --- | --- | --- | --- |
 | A | `name='b'` | 唯一 | record | 2 | REC_NOT_GAP | |
 | B | `age=20` | 普通 | | 4 |GAP\REC_NOT_GAP | |
-| C | `age between 10 and 30` | 普通 | | | | |
-| D | `memo='m1'` | 无 | | | | |
-| E | `age=20`（RC） | 普通 | | | | |
+| C | `age between 10 and 30` | 普通 | 临键锁| 3 | REC_NOT_GAP | |
+| D | `memo='m1'` | 无 | 全表锁 | 6 | IX | |
+| E | `age=20`（RC） | 普通 | | 2 | REC_NOT_GAP | |
 
 ## 7. 练习（判断 6 / 选择 4 / 简答 3 / SQL 分析 2）
 

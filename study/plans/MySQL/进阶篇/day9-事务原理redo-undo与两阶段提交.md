@@ -299,7 +299,7 @@ SHOW GLOBAL VARIABLES LIKE 'innodb_flush_log_at_trx_commit';   -- 默认 1
 > 答：对
 
 **3.** undo log 就是数据库的备份，可以用来恢复误删的数据。
-> 答：错，会被purge误删，binlog才是备份，只执行**逻辑反向操作**用于恢复未提交的事务和
+> 答：错，会被purge定期清理，binlog才是备份，只执行**逻辑反向操作**用于恢复未提交的事和
 > mcvv版本
 
 **4.** 两阶段提交里，如果 redo 已经是 prepare 状态、binlog 也写完整了，崩溃恢复会提交该事务。
@@ -338,7 +338,7 @@ D. `=2` + `sync_binlog=1`
 > 答：**层级**redo log在innodb层，binlog在sever层
 > **类别**redo log为物理级别（页+偏移+修改），binlog为逻辑级别（sql行列变换）
 > **用途**redo log用于崩溃恢复事务，binlog用于复制sql操作+归档 
-> **写法**redo lo重复写，可被覆盖，binlog追加写，可长期保存
+> **写法**redo lo循环写，可被覆盖，binlog追加写，可长期保存
 >
 **2. 为什么需要两阶段提交？如果先写 binlog 再写 redo 会怎样？**
 > 答：因为两个日志分属两层，必须"同时成功或同时失败"，否则主从/备份会不一致：如果**先写
@@ -347,7 +347,7 @@ D. `=2` + `sync_binlog=1`
 > 者"：binlog 完整就补提交，不完整就回滚。
 >
 **3. undo log 的两个用途分别是什么？**
-> 答：**回滚**当系统出现崩溃时撤销位提交的修改(原子性)
+> 答：**回滚**当系统出现崩溃或主动rollback时撤销未提交的修改(原子性)
 >**MVCC**：保存行的旧版本，通过 `roll_pointer` 组成版本链，让其他事务按 ReadView 读到历
 > 史版本（隔离性/一致性读）。
 >
@@ -356,15 +356,15 @@ D. `=2` + `sync_binlog=1`
 
 **1.** 某事务执行到「redo prepare 完成、binlog 写到一半」时机器断电。重启后这个事务是提交还是回滚？为什么？
 > 答：**回滚**
-> redo层修改好了数据，主库准备了，binlog层未prepare，从库读取不到redo层做出的修改，从库
-> 与主库不一致，执行回滚操作
+> redo层修改好了数据，主库准备了，binlog层只写了一半，从库重放redo日志不到，数据页还是
+> buffer pool里的脏页，从库与主库不一致，执行回滚操作
 >
 
 **2.** 一个 `update` 语句执行很慢且把其他会话全堵住了，你怀疑锁的问题，写出你的排查顺序（至少 3 步）。
 > 答：'show processlist'找堵塞事务'waiting for……lock'
->`performance_schema.data_locks`找持有哪些锁'data_for_lock'看在等谁
+>`performance_schema.data_locks`找持有哪些锁'data_lock_waits'看在等谁
 >`information_schema.INNODB_TRX` 看长事务（`trx_started`）与 `trx_rows_modified`
-> 'explain'该update，看事务是否走索引，还是全表锁
+> 'explain'该update，看这条update是否走索引，还是全表锁
 > 确认隔离级别是否为RR,有间隙锁
 > 必要时kill掉长事务
 

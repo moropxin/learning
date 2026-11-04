@@ -284,8 +284,8 @@ SHOW GLOBAL VARIABLES LIKE 'innodb_flush_log_at_trx_commit';   -- 默认 1
 | `innodb_flush_log_at_trx_commit` | 1 | redo刷盘策略 | 不会 |
 | `sync_binlog` | 1 | binlog刷盘策略 | 会 |
 | `innodb_redo_log_capacity` | 104857600 | redo总容量 | 会 |
-| `binlog_format` | ROW | | |
-| `log_bin` | ON | 是否开启binlog | |
+| `binlog_format` | ROW | binlogSEVER层 | 不会 |
+| `log_bin` | ON | 是否开启binlog | 不会 |
 
 
 ## 7. 练习
@@ -293,71 +293,80 @@ SHOW GLOBAL VARIABLES LIKE 'innodb_flush_log_at_trx_commit';   -- 默认 1
 ### A. 判断题（6）
 
 **1.** binlog 是 InnoDB 引擎层的日志，用于崩溃恢复。
-> 答：
+> 答：错，不用于崩溃恢复，是sever层的日志
 
 **2.** redo log 记录的是"哪个数据页改了什么"，属于物理日志。
-> 答：
+> 答：对
 
 **3.** undo log 就是数据库的备份，可以用来恢复误删的数据。
-> 答：
+> 答：错，会被purge误删，binlog才是备份，只执行**逻辑反向操作**用于恢复未提交的事务和
+> mcvv版本
 
 **4.** 两阶段提交里，如果 redo 已经是 prepare 状态、binlog 也写完整了，崩溃恢复会提交该事务。
-> 答：
+> 答：对
 
 **5.** `innodb_flush_log_at_trx_commit=1` 时，事务提交成功就一定不会丢。
-> 答：
+> 答：对
 
 **6.** 间隙锁在 RR 下不仅阻止 insert，也会锁住已有的记录。
-> 答：
+> 答：错，间隙锁只锁两行数据的间隙，不锁行
 
 ### B. 选择题（4）
 
 **1. 保证"已提交事务不丢"的日志是？**
 A. undo log　B. redo log　C. binlog　D. error log
-> 答：
+> 答：B
 
 **2. 支持主从复制的日志是？**
 A. undo log　B. redo log　C. binlog　D. slow log
-> 答：
+> 答：C
 
 **3. 两阶段提交中，崩溃恢复的判定依据是？**
 A. redo 是否 prepare　B. binlog 是否完整　C. 事务是否超过 60 秒　D. undo 是否清理
-> 答：
+> 答：B
 
 **4. 想要最高安全性，正确的组合是？**
 A. `flush_log_at_trx_commit=2` + `sync_binlog=1000`
 B. `=1` + `sync_binlog=1`
 C. `=0` + `sync_binlog=0`
 D. `=2` + `sync_binlog=1`
-> 答：
+> 答：B
 
 ### C. 简答题（3）
 
 **1. redo log 和 binlog 有什么区别？（至少说 3 点）**
-> 答：
->
->
+> 答：**层级**redo log在innodb层，binlog在sever层
+> **类别**redo log为物理级别（页+偏移+修改），binlog为逻辑级别（sql行列变换）
+> **用途**redo log用于崩溃恢复事务，binlog用于复制sql操作+归档 
+> **写法**redo lo重复写，可被覆盖，binlog追加写，可长期保存
 >
 **2. 为什么需要两阶段提交？如果先写 binlog 再写 redo 会怎样？**
-> 答：
->
+> 答：因为两个日志分属两层，必须"同时成功或同时失败"，否则主从/备份会不一致：如果**先写
+> binlog 再写 redo**，binlog 写成功但 redo 没写就崩溃 → 从库按 binlog 重放有了这条数>
+> 据，主库崩溃恢复后却没有（redo 没落）→ 主从不一致。两阶段提交让 binlog 成为"提交裁决
+> 者"：binlog 完整就补提交，不完整就回滚。
 >
 **3. undo log 的两个用途分别是什么？**
-> 答：
->
+> 答：**回滚**当系统出现崩溃时撤销位提交的修改(原子性)
+>**MVCC**：保存行的旧版本，通过 `roll_pointer` 组成版本链，让其他事务按 ReadView 读到历
+> 史版本（隔离性/一致性读）。
 >
 
 ### D. 分析题（2）
 
 **1.** 某事务执行到「redo prepare 完成、binlog 写到一半」时机器断电。重启后这个事务是提交还是回滚？为什么？
-> 答：
->
+> 答：**回滚**
+> redo层修改好了数据，主库准备了，binlog层未prepare，从库读取不到redo层做出的修改，从库
+> 与主库不一致，执行回滚操作
 >
 
 **2.** 一个 `update` 语句执行很慢且把其他会话全堵住了，你怀疑锁的问题，写出你的排查顺序（至少 3 步）。
-> 答：
->
->
+> 答：'show processlist'找堵塞事务'waiting for……lock'
+>`performance_schema.data_locks`找持有哪些锁'data_for_lock'看在等谁
+>`information_schema.INNODB_TRX` 看长事务（`trx_started`）与 `trx_rows_modified`
+> 'explain'该update，看事务是否走索引，还是全表锁
+> 确认隔离级别是否为RR,有间隙锁
+> 必要时kill掉长事务
 
 <details><summary><b>参考答案</b></summary>
 

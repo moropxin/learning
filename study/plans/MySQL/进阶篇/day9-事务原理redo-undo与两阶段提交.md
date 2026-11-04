@@ -281,11 +281,12 @@ SHOW GLOBAL VARIABLES LIKE 'innodb_flush_log_at_trx_commit';   -- 默认 1
 
 | 项 | 本机值 | 含义 | 会不会丢数据 |
 | --- | --- | --- | --- |
-| `innodb_flush_log_at_trx_commit` | | | |
-| `sync_binlog` | | | |
-| `innodb_redo_log_capacity` | | | |
-| `binlog_format` | | | |
-| `log_bin` | | | |
+| `innodb_flush_log_at_trx_commit` | 1 | redo刷盘策略 | 不会 |
+| `sync_binlog` | 1 | binlog刷盘策略 | 会 |
+| `innodb_redo_log_capacity` | 104857600 | redo总容量 | 会 |
+| `binlog_format` | ROW | | |
+| `log_bin` | ON | 是否开启binlog | |
+
 
 ## 7. 练习
 

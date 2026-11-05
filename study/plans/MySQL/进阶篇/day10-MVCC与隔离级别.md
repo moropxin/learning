@@ -266,74 +266,81 @@ SHOW ENGINE INNODB STATUS\G
 ### A. 判断题（6）
 
 **1.** MVCC 会把整行数据复制一份快照存在内存里供其他事务读取。
-> 答：
+> 答：错，MVCC不复制数据，靠[隐藏字段 + undo版本链 + readview]实现按需定位旧版本
 
 **2.** RR 隔离级别下，ReadView 是在执行 `BEGIN` 时立即生成的。
-> 答：
+> 答：错，在普通select语句时生成，在update……select语句后生成
 
 **3.** 普通 `SELECT` 是快照读，`SELECT ... FOR UPDATE` 是当前读。
-> 答：
+> 答：对
 
 **4.** RC 与 RR 的差别在于 RC 不加锁、RR 加锁。
-> 答：
+> 答：错，两者都用MVCC，但RC级别的readview会在每次select更新
 
 **5.** ReadView 的 `max_trx_id` 是 `m_ids` 里最大的那个事务 ID。
-> 答：
+> 答：错，是下一个要分配活事务的id
 
 **6.** RR 隔离级别下幻读已经完全不可能发生。
-> 答：
+> 答：错，当前读顶掉快照读时，当其他窗口修改了事务会发生幻读
 
 ### B. 选择题（4）
 
 **1. 一行数据的 `DB_TRX_ID` 记录的是？**
 A. 创建这行的事务 ID　B. 最后修改这行的事务 ID　C. 最早读这行的事务 ID　D. 当前活跃事务数
-> 答：
+> 答：B
 
 **2. 以下哪条语句走的是「当前读」？**
 A. `SELECT * FROM t WHERE id = 1`
 B. `SELECT * FROM t WHERE id = 1 FOR UPDATE`
 C. `SELECT COUNT(*) FROM t`
 D. `SELECT * FROM t WHERE id = 1 LIMIT 1`
-> 答：
+> 答：B
 
 **3. RC 与 RR 最本质的区别是？**
 A. 是否使用 undo log　B. ReadView 生成时机　C. 是否使用间隙锁　D. 是否支持事务
-> 答：
+> 答：B
 
 **4. 判断一行是否可见时，`trx_id < min_trx_id` 说明？**
 A. 该事务还活跃　B. 该事务在快照生成前已提交，可见　C. 该事务在快照之后才开，不可见　D. 该事务被回滚
-> 答：
+> 答：B
 
 ### C. 简答题（3）
 
 **1. 简述 MVCC 的三件套，以及它们各自的作用。**
-> 答：
->
->
+> 答：**隐藏字段**：'DB_TRX_ID'存最后修改的事务，'DB_ROLL_PTR'存undo上一个版本的信息
+> 给溯源提供索引
+> **undo版本链**：每一个版本存到里面，形成一个链表，提供每一个版本信息
+> **readview**：瞬间时刻活着的事务
 >
 
 **2. 同样是「事务 A 两次读同一行」，为什么 RC 会读到变化、RR 不会？**
-> 答：
->
->
+> 答：RC不可重复读，在事务A生成第一次时会有一次readview，第二次时会再生成一个版本的
+>     readview，第一次的事务已经为旧版本了
+>     RR可重复读，在事务A生成第一次时有readview，随后在第二次读时顺roll_ptr翻到旧版本查
+>     看
 >
 
 **3. RR 下快照读为什么不会幻读？那幻读又是怎么在 RR 下冒出来的？**
-> 答：
->
+> 答：RR下快照读有MVCC挡幻读，版本不变
+> 当生成快照读后执行update事务，select语句就变为当前读
+> 当前读把快照读的位置挤掉了，版本进行了更新，数据可能被更新过造成幻读
 >
 >
 
 ### D. 分析题（2）
 
 **1.** 事务 A（RR）先 `SELECT` 一次拿到 `memo='v0'`，随后事务 B 改为 `'v1'` 并提交。之后 A 执行 `UPDATE t_mvcc SET memo='v2' WHERE id=1`，请问 `UPDATE` 时它读到的是 `v0` 还是 `v1`？为什么最终值是 `v2`？
-> 答：
+> 答：读到v0，因为RR隔离级别下有MVCC保护，readview在普通读的情况下始终为当前版本
+> 事务B修改的数据版本在事务A的update语句之前，版本号相比更旧，v2为最新readview的数据
 >
 >
 
 **2.** 线上出现「同一事务里两次查询结果不一致」，同事怀疑是 RC 隔离级别。你怎么验证？给出至少 3 步。
-> 答：
->
+> 答：先用'select @@transaction_isolation'语句查看当前窗口隔离级别，
+> 若为RC级别则用'set session transation isolation level repeatable read'语句改为RR级
+> 别
+> 再执行两次查询之间让另一个窗口执行操作，看是否出现不同
+> 用'information_schema.INNODB_TRX'语句查看两个事务是否在同一个数据源
 >
 
 <details><summary><b>参考答案</b></summary>

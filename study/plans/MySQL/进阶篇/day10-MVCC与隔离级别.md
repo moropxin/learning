@@ -254,12 +254,12 @@ SHOW ENGINE INNODB STATUS\G
 
 | 实验 | 隔离级别 | 第二次读到的值 | 结论 |
 | --- | --- | --- | --- |
-| B 可重复读 | RR | | |
-| C 不可重复读 | RC | | |
-| D 快照 vs 当前读 | RR | | |
-| E1 快照读 count | RR | | |
-| E2 update 影响行数 | RR | | |
-| F History list length | RR | | |
+| B 可重复读 | RR | v0 | RR级别下根据版本链和readview可找回当前活事务，readview里max_trx_id大于m_ids不可见 |
+| C 不可重复读 | RC | v2-b | RC级别下不可重复读，再读会读当前最新的readview，而窗口B的修改事务结束后生成了新的readview |
+| D 快照 vs 当前读 | RR | v3-a | RR级别下同一个事务，快照读读历史版本，当前读读最新版本 |
+| E1 快照读 count | RR | 1 | RR级别下快照读可被MCVV挡住幻读 |
+| E2 update 影响行数 | RR | 2 | 但挡不住「当前读撞上新行后自己的快照被顶掉」 |
+| F History list length | RR | | 长旧事务不提交旧版本会积累，提交后purge线程才清理旧版本 |
 
 ## 8. 练习
 

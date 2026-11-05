@@ -310,7 +310,8 @@ A. 该事务还活跃　B. 该事务在快照生成前已提交，可见　C. �
 > 答：**隐藏字段**：'DB_TRX_ID'存最后修改的事务，'DB_ROLL_PTR'存undo上一个版本的信息
 > 给溯源提供索引
 > **undo版本链**：每一个版本存到里面，形成一个链表，提供每一个版本信息
-> **readview**：瞬间时刻活着的事务
+> **readview**：瞬间时刻活着的事务（`m_ids`/`min_trx_id`/`max_trx_id`/`creator_trx_id`），按四条规则判断哪个版本可
+> 见。
 >
 
 **2. 同样是「事务 A 两次读同一行」，为什么 RC 会读到变化、RR 不会？**
@@ -323,24 +324,25 @@ A. 该事务还活跃　B. 该事务在快照生成前已提交，可见　C. �
 **3. RR 下快照读为什么不会幻读？那幻读又是怎么在 RR 下冒出来的？**
 > 答：RR下快照读有MVCC挡幻读，版本不变
 > 当生成快照读后执行update事务，select语句就变为当前读
-> 当前读把快照读的位置挤掉了，版本进行了更新，数据可能被更新过造成幻读
+> 当前读读到了B新插入的行，版本进行了更新，这行的trx_id变成了自己的，造成幻读
 >
 >
 
 ### D. 分析题（2）
 
 **1.** 事务 A（RR）先 `SELECT` 一次拿到 `memo='v0'`，随后事务 B 改为 `'v1'` 并提交。之后 A 执行 `UPDATE t_mvcc SET memo='v2' WHERE id=1`，请问 `UPDATE` 时它读到的是 `v0` 还是 `v1`？为什么最终值是 `v2`？
-> 答：读到v0，因为RR隔离级别下有MVCC保护，readview在普通读的情况下始终为当前版本
+> 答：读到v1，因为update是当前读，已经是读取最新版本了
 > 事务B修改的数据版本在事务A的update语句之前，版本号相比更旧，v2为最新readview的数据
 >
 >
 
 **2.** 线上出现「同一事务里两次查询结果不一致」，同事怀疑是 RC 隔离级别。你怎么验证？给出至少 3 步。
 > 答：先用'select @@transaction_isolation'语句查看当前窗口隔离级别，
+> 查 `information_schema.INNODB_TRX` 确认事务是否真的"同一个"（连接池可能复用连接导致
+> 误判）
+> 再执行两次查询之间让另一个窗口执行操作，看是否出现不同数据的情况
 > 若为RC级别则用'set session transation isolation level repeatable read'语句改为RR级
 > 别
-> 再执行两次查询之间让另一个窗口执行操作，看是否出现不同
-> 用'information_schema.INNODB_TRX'语句查看两个事务是否在同一个数据源
 >
 
 <details><summary><b>参考答案</b></summary>

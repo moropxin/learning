@@ -448,13 +448,20 @@ D. 用 `TEXT` 存订单信息
 ### D. 设计题（2）
 
 **1.** 设计一张"点赞记录表"，要求：能记录"谁在什么时候赞了哪条评价"，同一个人对同一条评价只能赞一次，并且能快速查出"某条评价的所有点赞"和"某个用户赞过的所有评价"。给出 DDL 并说明索引。
-> 答：
->
->
+> 答：create table t_like (
+>          id bigint unsigned not null auto_increment,
+>          blog_id bigint unsigned not null comment '被赞的评价',
+>          user_id bigint unsigned not null comment '点赞用户',
+>          create_time datatime not null default current_timestamp,
+>          primary key (id),
+>          unique key uk_staus(blog_id,user_id) comment '防止重复点赞',
+>          key idx_id (user_id,create_time) commit '查某用户赞过的评价'
+>         )engine = innodb commit = '点赞记录表';
 
 **2.** 有一张 `t_article(id, title, content, author_name, author_avatar, category_name, tags)`，其中 `tags='Java,MySQL'`、`author_avatar` 只由作者决定、`category_name` 只由分类决定。指出它违反了哪些范式，给出改造方案（写出表结构即可）。
-> 答：
->
+> 答：违反了1NF：tags的列还可以再细分，把tags单独拆表
+>     违反了2NF:author和非主键依赖，当查询作者时多个重复
+>     违反了3NF:非主键列不能依赖非主键列，要单独存
 >
 
 <details><summary><b>参考答案</b></summary>

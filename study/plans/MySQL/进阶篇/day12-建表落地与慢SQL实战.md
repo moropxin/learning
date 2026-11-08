@@ -325,11 +325,11 @@ CREATE TABLE t_blog_rank (
 
 | Case | 优化前 type / key / rows / Extra | 优化后 type / key / rows / Extra | 优化前耗时 | 优化后耗时 |
 | --- | --- | --- | --- | --- |
-| 1 店铺列表排序 | | | | |
-| 2 券列表联合索引顺序 | | | | |
-| 3 订单深分页 | | | | |
-| 4 评价数 count | | | | |
-| 5 点赞排行榜 | | | | |
+| 1 店铺列表排序 | ref/idx_type/250/using filesort | ref/idx_type_score/250/Backward index scan| 354ms | 349ms |
+| 2 券列表联合索引顺序 | range/idx_status_time/200/Using index condition; Using where; Backward index scan| range/idx_shop_status_begin/10/Using index condition; Backward index scan | 336ms | 346ms |
+| 3 订单深分页 | ref/idx_user/1000/using filesort | range/idx_user_time/959/Using index condition; Backward index scan | 368ms | 335ms |
+| 4 评价数 count | ref/idx_shop_time/2500/using index | ref/idx_shop_time/2000/using index | 350ms | 342ms |
+| 5 点赞排行榜 | index/uk_blog_user/19694/Using index; Using temporary; Using filesort| index/idx_blog/199694/Using index; Using temporary | 345ms | 334ms |
 
 **② M1 自检清单（明天验收就看这 10 条）**
 
@@ -351,59 +351,63 @@ CREATE TABLE t_blog_rank (
 ### A. 判断题（6）
 
 **1.** 只要 `WHERE` 用到了索引，`ORDER BY` 就一定不会 filesort。
-> 答：
+> 答：错，order by没有索引要造临时表排序，依旧filesort
 
 **2.** 联合索引 `(a, b, c)` 中，若 `b` 用了范围查询，`c` 仍能用于排序。
-> 答：
+> 答：错，范围查询后的索引失效
 
 **3.** 深分页慢的根因是"扫了 offset 行却只返回 10 行"。
-> 答：
+> 答：对，扫描并丢弃了前面的多数行，全不是目标行数
 
 **4.** `GROUP BY` 一定产生临时表。
-> 答：
+> 答：错，当group by的列做索引前缀时不产生临时表，但若后面有聚合结果排序仍要临时排序
 
 **5.** `ALTER TABLE ... ADD KEY` 在大表上是瞬间完成的。
-> 答：
+> 答：alter 全表需要扫描全表并重建索引，要锁表耗时长
 
 **6.** 优化后 `rows` 变小但耗时没变，说明优化无效。
-> 答：
+> 答：错，rows只是估算值，可能在优化中仍需回表或filesort，应在explain analyz里查看实际用时
 
 ### B. 选择题（4）
 
 **1. `WHERE a=? AND b>? ORDER BY c`，最佳索引是？**
 A. `(a, b, c)`　B. `(a, c, b)`　C. `(b, c)`　D. `(c, a, b)`
-> 答：
+> 答：B , a为等值条件（优先） b为范围条件（末尾）c为排序（次之）
 
 **2. 深分页 `LIMIT 100000, 10` 最有效的改法是？**
 A. 加大 `innodb_buffer_pool_size`　B. 延迟关联或书签翻页　C. 把 `SELECT *` 改成 `SELECT id`　D. 加 `FORCE INDEX`
-> 答：
+> 答：B
 
 **3. `ORDER BY cnt DESC`（cnt 是 `COUNT(*)` 的结果）能走索引吗？**
 A. 能，只要有索引　B. 不能，聚合值必须现场算再排　C. 能，需要覆盖索引　D. 能，需要降序索引
-> 答：
+> 答：B
 
 **4. 加了 `(user_id, create_time)` 索引后，深分页仍慢，主要因为？**
 A. 索引没生效　B. 仍要扫过前 offset 条索引记录再回表　C. 索引太大　D. 没有 ANALYZE
-> 答：
+> 答：B
 
 ### C. 简答题（3）
 
 **1. 拿到一条慢 SQL，你的排查顺序是什么？（至少 5 步）**
-> 答：
->
+> 答：开慢日志查events_statements_summary_by_digest，看具体sql情况
+>     再explain看tpye/key/row/extra，分析索引类型，扫描范围，语句用法
+>     按需加上索引或重构sql语句
+>     再explain看上述改善内容，是否走了索引，索引类型是否优化，扫描范围rows是否减少
+>     analyze explain看耗时优化情况
 >
 >
 
 **2. 联合索引里"范围列"为什么要放最后？用一个具体例子说明。**
-> 答：
->
->
+> 答：selec id from lab where a > 2 and b = 1 order by c desc；**索引为idx（a，b，c）**
+>    这条语句当a为范围列时，b和c即便有索引也退化为普通查询和排序
+>    因此要将索引优化为**idx（b，c，a）**
 >
 
 **3. 什么情况下该用冗余计数，什么情况下不该？**
-> 答：
+> 答：当计数长期不变时、当列表页要展示多个对象的计数（店铺列表显示评价数）、计数查询极频繁且允许短暂不一致、写入频率远低于读取**可用**
+>当金融/订单类强一致条件时、当计数变化频繁时、当需要精细分账时**不可用**
 >
->
+> 
 
 ### D. 优化题（2）
 
@@ -416,8 +420,9 @@ ORDER BY create_time DESC
 LIMIT 20;
 ```
 
-> 答：
->
+> 答：加联合索引idx（category_id,status,create_time）
+>    等值列在前，排序列在后
+>     type：ref
 >
 
 **2.** 下面这条统计 SQL 每次都扫全表，改成"预聚合"方案，写出表结构和更新方式：
@@ -429,6 +434,29 @@ GROUP BY shop_id;
 ```
 
 > 答：
+ ```sql
+CREATE TABLE t_shop_blog_daily (
+  shop_id  BIGINT UNSIGNED NOT NULL,
+  stat_day DATE            NOT NULL,
+  cnt      INT             NOT NULL DEFAULT 0,
+  PRIMARY KEY (shop_id, stat_day),
+  KEY idx_day (stat_day)
+) ENGINE = InnoDB COMMENT = '店铺每日评价数（预聚合）';
+
+-- 更新方式：定时任务（每小时/每天）用 INSERT ... ON DUPLICATE KEY UPDATE 累加
+INSERT INTO t_shop_blog_daily (shop_id, stat_day, cnt)
+SELECT shop_id, DATE(create_time), COUNT(*)
+FROM t_blog
+WHERE create_time >= CURDATE()
+GROUP BY shop_id, DATE(create_time)
+ON DUPLICATE KEY UPDATE cnt = VALUES(cnt);
+
+-- 查询近 7 天：只扫 7 天 × 店铺数的窄表
+SELECT shop_id, SUM(cnt) FROM t_shop_blog_daily
+WHERE stat_day >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+GROUP BY shop_id;
+```
+
 >
 >
 

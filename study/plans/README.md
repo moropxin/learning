@@ -9,7 +9,7 @@
 | --- | --- | --- | --- | --- | --- |
 | W0 | 10/21–10/25 | 对齐与自查 | A | 起点确认 | [week00](week00-对齐与自查.md) |
 | W1 | 10/26–11/01 | MySQL 进阶上（索引/优化） | A | — | [week01](week01-MySQL进阶上-索引与优化.md) |
-| W2 | 11/02–11/08 | MySQL 进阶下（锁/事务/设计） | A | M1 | [week02](week02-MySQL进阶下-锁事务与设计.md) |
+| W2 | 11/03–11/08 | MySQL 进阶下（锁/事务/设计） | A | M1（部分通过 26.5/40） | [week02](week02-MySQL进阶下-锁事务与设计.md) |
 | W3 | 11/09–11/15 | Java 自检 + 补强 | B | M2 | [week03](week03-Java自检与补强.md) |
 | W4 | 11/16–11/22 | JavaWeb 上 | C | — | [week04](week04-JavaWeb上-Servlet与会话.md) |
 | W5 | 11/23–11/29 | JavaWeb 下 + 小项目 | C | M3 | [week05](week05-JavaWeb下-小项目实战.md) |

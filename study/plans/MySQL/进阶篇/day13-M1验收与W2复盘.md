@@ -51,8 +51,7 @@ graph LR
 
 ### Q3. 拿到一条慢 SQL，你的排查顺序是什么？
 
-> （录音，写完 5 个步骤的关键词在这里）先查看该条sql语句运行情况，再explain查看type/key/len/extra，再analyze explain查看耗时，根据情况建立索引或重构sql语句，analyze再次查看耗时情况，最后explain查看具体情况是否优化成功
-
+> （录音，写完 5 个步骤的关键词在这里）先查看该条sql语句运行情况，再explain查看type/key/len/extra，再对问题进行加索引或重构sql语句，接着analyze table看统计信息，最后explain analyze复测看是否优化成功
 ### 自评表
 
 | 维度 | Q1 | Q2 | Q3 | 说明 |
@@ -80,7 +79,7 @@ graph LR
 > 答：错，存整行数据，非叶子节点存主键值，二级索引的叶子节点才存主键值
 
 **2.** 一张 InnoDB 表可以建多个聚簇索引，只要主键不同。
-> 答：错，主键唯一性
+> 答：错，聚簇索引只有一个，一般用主键
 
 **3.** 联合索引 `(a, b, c)` 上，`WHERE b = 1 AND c = 2` 能用到这个索引。
 > 答：错，最左前缀
@@ -141,7 +140,7 @@ A. 主键（聚簇索引）　B. 最小的二级索引　C. 随便一个　D. �
 > 答：m_ids,min,max,creator  RR在事务开始时只生成一次readview，RC在每次查询都会生成新的readview
 
 **18.** 一条 SQL 变慢，你的排查顺序是什么（至少 5 步）？
-> 答：先查看sql情况，再explain查看语句的type、key、len、extra，接着analyze语句耗时情况，根据对应问题优化sql语句或修改索引，最后analyz explain查看耗时情况和语句属性是否优化成功
+> 答：先查看sql情况，再explain查看语句的type、key、len、extra，根据对应问题优化sql语句或修改索引，然后analyze table刷新统计信息，最后explain analyze查看耗时情况和语句属性是否优化成功
 
 ### D. 分析题（2，每题 7 分）
 
@@ -153,14 +152,14 @@ ORDER BY create_time DESC
 LIMIT 20;
 ```
 请写出 `type`、`key`、`rows` 量级、`Extra`，并说明是否有回表、是否需要 filesort。
-> 答：type:ref    key:idx_user_time    rows:十位数量级    extra：using index    联合索引无需回表，有聚合结果需要filesort
+> 答：type:range    key:idx_user_time    rows:十位数量级    extra：using index condition    联合索引无需回表，不需要filesort
 
 **20.** RR 下有两个窗口：
 - 窗口 A：`BEGIN; UPDATE t SET c = c + 1 WHERE b = 5;`（`b` 是普通索引，命中 3 行，不提交）
 - 窗口 B：`INSERT INTO t (b, c) VALUES (6, 1);`
 
 问：B 会阻塞吗？为什么？如果 B 插的是 `b = 5` 会怎样？
-> 答：不会，窗口A的事务加的是临键锁，但锁只锁到b = 5之前，窗口B插入b = 6 未上锁，不会堵塞。如果窗口B插入 b = 5则命中临键锁范围，会堵塞
+> 答：不会，窗口A的事务加的是临键锁，但锁只锁到b = 5和b = 6之间，窗口B插入b = 6 未上锁，不会堵塞。如果窗口B插入 b = 5则命中临键锁范围，会堵塞
 
 <details><summary><b>参考答案</b></summary>
 

@@ -176,10 +176,10 @@ System.out.println(list);       // [A, C]
 
 **验收标准（做完自查，不达标就重做）**
 
-- [ ] 三种遍历都能**不看笔记**写出，且能说出各自适用场景
-- [ ] 能口述 ArrayList 的扩容三条规则（10 / 1.5 倍 / arraycopy）
-- [ ] 能解释 `remove(1)` 和 `remove(Integer.valueOf(1))` 的区别
-- [ ] 代码能跑通，控制台输出和预期一致
+- [T] 三种遍历都能**不看笔记**写出，且能说出各自适用场景
+- [T] 能口述 ArrayList 的扩容三条规则（10 / 1.5 倍 / arraycopy）
+- [T] 能解释 `remove(1)` 和 `remove(Integer.valueOf(1))` 的区别
+- [T] 代码能跑通，控制台输出和预期一致
 
 ## 7. 练习（先自己写，再看答案）
 
@@ -187,40 +187,40 @@ System.out.println(list);       // [A, C]
 
 **A1.** `ArrayList` 无参构造时立即分配容量 10 的数组。
 
-> 答：
+> 答：错，不分配空间
 
 **A2.** `List` 允许存重复元素，且元素有顺序。
 
-> 答：
+> 答：对
 
 **A3.** `list.remove(1)` 在 `List<Integer>` 中删除的是值为 1 的元素。
 
-> 答：
+> 答：错，删下标，integer.valuesof(1)才是删值
 
 **A4.** 扩容时是在原数组后面直接追加空间，不需要拷贝。
 
-> 答：
+> 答：错，是创建一个新的扩容数组再copy过去
 
 **A5.** 增强 for 循环底层使用的是迭代器。
 
-> 答：
+> 答：对
 
 ### B. 选择（5 题，每题 1 分）
 
 **B1.** `new ArrayList<>()` 后第一次 `add` 时，底层数组容量变为：
 A. 0　B. 10　C. 16　D. 15
 
-> 答：
+> 答：B
 
 **B2.** 容量 10 的 ArrayList 装满后再 add，新容量是：
 A. 11　B. 15　C. 20　D. 10
 
-> 答：
+> 答：B
 
 **B3.** 下列哪个操作在 ArrayList 中间插入时最慢（代价最高）：
 A. `add(e)`　B. `add(0, e)`　C. `get(0)`　D. `size()`
 
-> 答：
+> 答：B
 
 **B4.** 想在遍历过程中安全删除元素，应该用：
 A. `for (String s : list) { list.remove(s); }`
@@ -228,26 +228,26 @@ B. `for (int i = 0; i < list.size(); i++) { list.remove(i); }`
 C. `Iterator<String> it = list.iterator(); while (it.hasNext()) { if (...) it.remove(); }`
 D. `list.clear();`
 
-> 答：
+> 答：C
 
 **B5.** `List<String> list = new ArrayList<>();` 这行代码体现了：
 A. 面向接口编程　B. 多继承　C. 反射　D. 泛型擦除
 
-> 答：
+> 答：A
 
 ### C. 简答（3 题，每题 2 分）
 
 **C1.** 用自己的话说清 ArrayList 的扩容过程（为什么扩容、扩到多少、怎么扩）。
 
-> 答：
+> 答：当数组长度不够时要进行扩容，扩大到原数组长度的1.5倍，创建新数组复制进去
 
 **C2.** `for (String s : list)` 里调用 `list.remove(s)` 为什么会抛异常？怎么改？
 
-> 答：
+> 答：arraylist里有modcount，迭代器里用expectedmodcount替代，每次next（）时会检查两者是否相等，而list.remove(s)只改变原modcount。将for增强改为迭代器实现，每次remove都会同步更新
 
 **C3.** 为什么业务代码习惯写 `List<String> list = new ArrayList<>()`，而不是 `ArrayList<String> list = new ArrayList<>()`？
 
-> 答：
+> 答：左边写接口 = 只依赖"能按顺序存、能下标取"这个契约，不绑定具体实现。以后想换 `LinkedList` 或 `CopyOnWriteArrayList`，只改右边一处；方法参数也建议声明成 `List`，调用方传什么实现都行。这是"面向接口编程"。
 
 <details>
 <summary>参考答案</summary>

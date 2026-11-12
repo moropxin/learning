@@ -222,64 +222,65 @@ list.removeAll(toRemove);
 
 **A1.** `LinkedList` 底层是数组。
 
-> 答：
+> 答：错，是链表，随机地址存储
 
 **A2.** `LinkedList.get(100)` 的时间复杂度是 O(1)。
 
-> 答：
+> 答：是O(n)，要按照后继一直找
 
 **A3.** 在 `LinkedList` 头部插入元素比在 `ArrayList` 头部插入快。
 
-> 答：
+> 答：对，链表插入只需修改前驱和后继，数组要整体后移
 
 **A4.** 增强 for 循环遍历集合时，可以安全地调用 `list.remove()` 删除元素。
 
-> 答：
+> 答：错，modcount和expectedmodcount不对齐，会报错
 
 **A5.** `LinkedList` 每个节点除了数据，还要存前后两个引用，所以比 `ArrayList` 更占内存。
 
-> 答：
+> 答：对，而且节点是随机存储的，空间利用更大
 
 ### B. 选择（5 题）
 
 **B1.** `LinkedList` 的底层结构是：
 A. 数组　B. 单向链表　C. 双向链表　D. 红黑树
 
-> 答：
+> 答：C
 
 **B2.** 下列哪个操作 LinkedList 比 ArrayList 快：
 A. `get(500)`　B. `add(0, e)`　C. 遍历全部元素　D. `size()`
 
-> 答：
+> 答：B
 
 **B3.** `Iterator` 的 `remove()` 方法，调用前必须：
 A. 先调用 `hasNext()`　B. 先调用 `next()`　C. 先调用 `size()`　D. 不需要任何前置
 
-> 答：
+> 答：A
 
 **B4.** `ConcurrentModificationException` 产生的根本原因是：
 A. 多线程访问　B. 遍历过程中集合结构被修改，`modCount` 与 `expectedModCount` 不一致　C. 集合为空　D. 泛型类型不匹配
 
-> 答：
+> 答：B
 
 **B5.** 想实现一个"先进先出"的队列，最推荐用：
 A. `ArrayList`　B. `LinkedList`　C. `ArrayDeque`　D. `HashSet`
 
-> 答：
+> 答：B
 
 ### C. 简答（3 题）
 
 **C1.** 用一句话说清 ArrayList 和 LinkedList 的区别，再说说业务里为什么基本都用 ArrayList。
 
-> 答：
+> 答：一个是数组，连续且由数组下标和数据组成。另一个是双向链表，不连续且由前驱、后继和数据组成。
+> 实际业务里arraylist占用空间更小，查找时间级别为O(1)
 
 **C2.** 为什么 `for (String s : list) { list.remove(s); }` 会抛异常？`it.remove()` 为什么不会？
 
-> 答：
+> 答：因为list.remove只改变了modcount，不改变expectedmodmount，删除元素链表会丢失，抛fail-fast异常。而it.renmove是用迭代器自己的删除，会同步更新expectedmodmount
 
 **C3.** 用迭代器遍历 LinkedList 和用 `get(i)` 遍历，性能差在哪？为什么？
 
-> 答：
+> 答：get(i)每次遍历要从头扫到尾巴，时间级别为O(n^2)，而用迭代器则全扫描再一次定位，时间级别为O(n)
 
 <details>
 <summary>参考答案</summary>

@@ -226,7 +226,7 @@ list.removeAll(toRemove);
 
 **A2.** `LinkedList.get(100)` 的时间复杂度是 O(1)。
 
-> 答：是O(n)，要按照后继一直找
+> 答：错，是O(n)，要按照后继一直找
 
 **A3.** 在 `LinkedList` 头部插入元素比在 `ArrayList` 头部插入快。
 
@@ -255,7 +255,7 @@ A. `get(500)`　B. `add(0, e)`　C. 遍历全部元素　D. `size()`
 **B3.** `Iterator` 的 `remove()` 方法，调用前必须：
 A. 先调用 `hasNext()`　B. 先调用 `next()`　C. 先调用 `size()`　D. 不需要任何前置
 
-> 答：A
+> 答：B
 
 **B4.** `ConcurrentModificationException` 产生的根本原因是：
 A. 多线程访问　B. 遍历过程中集合结构被修改，`modCount` 与 `expectedModCount` 不一致　C. 集合为空　D. 泛型类型不匹配
@@ -265,7 +265,7 @@ A. 多线程访问　B. 遍历过程中集合结构被修改，`modCount` 与 `e
 **B5.** 想实现一个"先进先出"的队列，最推荐用：
 A. `ArrayList`　B. `LinkedList`　C. `ArrayDeque`　D. `HashSet`
 
-> 答：B
+> 答：C
 
 ### C. 简答（3 题）
 

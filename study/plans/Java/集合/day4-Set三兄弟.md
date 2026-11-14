@@ -268,10 +268,10 @@ System.out.println(set.size());     // 1
 
 **验收标准**
 
-- [ ] 能说出 `HashSet` 底层是什么，`add` 的返回值代表什么
-- [ ] 能解释"只重写 `equals` 不重写 `hashCode` 为什么去重失败"
-- [ ] 能说出 `TreeSet` 去重看的是 `equals` 还是 `compare` 返回值
-- [ ] 三种 Set 的选型能一句话说出
+- [T] 能说出 `HashSet` 底层是什么，`add` 的返回值代表什么
+- [T] 能解释"只重写 `equals` 不重写 `hashCode` 为什么去重失败"
+- [T] 能说出 `TreeSet` 去重看的是 `equals` 还是 `compare` 返回值
+- [T] 三种 Set 的选型能一句话说出
 
 ## 11. 练习（先写，再看答案）
 
@@ -279,64 +279,64 @@ System.out.println(set.size());     // 1
 
 **A1.** `HashSet` 底层是一个数组 + 链表 + 红黑树。
 
-> 答：
+> 答：错，是一个哈希表，通过键值对实现
 
 **A2.** 自定义类只重写 `equals` 不重写 `hashCode`，也能在 `HashSet` 里正常去重。
 
-> 答：
+> 答：错，hashcode不重写，类型始终升级为Object等上界，键无法配对定位到桶，去重失败
 
 **A3.** `TreeSet` 里的元素一定是有序的，且不能放 `null`。
 
-> 答：
+> 答：对，放null会NPE，通过红黑树实现
 
 **A4.** `LinkedHashSet` 保证元素按添加顺序遍历，是因为它底层多了双向链表。
 
-> 答：
+> 答：对
 
 **A5.** 两个对象的 `hashCode` 相同，它们一定 `equals` 相等。
 
-> 答：
+> 答：错，不一定，只是通过hash公式计算得hashcode相同，值可能不同，此时出现hash冲突，当不equals时接单链表形式
 
 ### B. 选择（5 题）
 
 **B1.** `HashSet.add()` 返回 `false` 说明：
 A. 添加失败抛出异常　B. 集合已满　C. 元素已存在，被去重　D. 元素为 null
 
-> 答：
+> 答：B
 
 **B2.** 想让 `Set` 按添加顺序输出，应该用：
 A. `HashSet`　B. `LinkedHashSet`　C. `TreeSet`　D. `ArrayList`
 
-> 答：
+> 答：B
 
 **B3.** `TreeSet` 判断两个元素是否重复，依据是：
 A. `hashCode` 相同　B. `equals` 为 true　C. `compare` 返回 0　D. 内存地址相同
 
-> 答：
+> 答：C
 
 **B4.** 下列哪个不能放进 `TreeSet` 并正常排序：
 A. `Integer`　B. `String`　C. 实现了 `Comparable` 的 `Student`　D. 没实现 `Comparable` 也没给 `Comparator` 的 `Student`
 
-> 答：
+> 答：D
 
 **B5.** `HashSet` 中"先算哈希值再比 `equals`"的原因是：
 A. 哈希值比较是 int 比较，更快，能先筛掉绝大多数不同对象　B. `equals` 方法有 bug　C. 哈希值相同才能比较对象　D. 为了记录元素个数
 
-> 答：
+> 答：A
 
 ### C. 简答（3 题）
 
 **C1.** 用自己的话说清 `HashSet` 是怎么去重的（从 `add` 到"加不进去"的完整过程）。
 
-> 答：
+> 答：add先经过计算hash值，对比桶中，若发现存在，对比其是否equals，若有值存在，则去重该元素，返回false
 
 **C2.** 为什么重写 `equals` 必须同时重写 `hashCode`？举个会出问题的例子。
 
-> 答：
+> 答：若只重写equals，每次add都会生成新对象，而此时对象继承Object，存的是内存地址，而没有重写hashcode导致hash值对照错误，即使对象已存桶，仍不去重
 
 **C3.** `HashSet`、`LinkedHashSet`、`TreeSet` 分别什么场景用？各说一句话。
 
-> 答：
+> 答：hashset适合仅去重，linkhashset适合去重加按照原排序，treeset适合去重+要排序
 
 <details>
 <summary>参考答案</summary>

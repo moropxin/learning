@@ -224,10 +224,10 @@ System.out.println(map);   // {10=a, 20=b, 30=c}  —— 按 key 升序
 
 **验收标准**
 
-- [ ] 能说出 `put` 的返回值代表什么
-- [ ] 能说出 `entrySet` 比 `keySet + get` 快在哪
-- [ ] 不查资料能写出 `getOrDefault` 版词频统计
-- [ ] 能说出 `TreeMap` 和 `HashMap` 的三个区别
+- [T] 能说出 `put` 的返回值代表什么
+- [T] 能说出 `entrySet` 比 `keySet + get` 快在哪
+- [T] 不查资料能写出 `getOrDefault` 版词频统计
+- [T] 能说出 `TreeMap` 和 `HashMap` 的三个区别
 
 ## 9. 练习（先写，再看答案）
 
@@ -235,64 +235,64 @@ System.out.println(map);   // {10=a, 20=b, 30=c}  —— 按 key 升序
 
 **A1.** `HashMap` 的 key 不允许重复，重复 `put` 会覆盖旧 value。
 
-> 答：
+> 答：对
 
 **A2.** `HashMap` 的 key 和 value 都可以放 `null`。
 
-> 答：
+> 答：对
 
 **A3.** `TreeMap` 是按 value 排序的。
 
-> 答：
+> 答：错，先按key排序，要手动转换为value排序要转换为list并sort
 
 **A4.** `HashMap` 的默认初始容量是 16，负载因子是 0.75。
 
-> 答：
+> 答：对
 
 **A5.** `Map` 接口继承自 `Collection` 接口。
 
-> 答：
+> 答：错，Map和Collection是两条平行的线
 
 ### B. 选择（5 题）
 
 **B1.** `map.put("a", 2)` 当 key "a" 已存在时，返回值是：
 A. 新值 2　B. 旧值　C. `null`　D. 抛异常
 
-> 答：
+> 答：A
 
 **B2.** 同时遍历 key 和 value，最高效的方式是：
 A. `keySet()` + `get()`　B. `values()`　C. `entrySet()`　D. `forEach` 里 `get()`
 
-> 答：
+> 答：C
 
 **B3.** 下列哪个 Map 的 key 不能是 `null`：
 A. `HashMap`　B. `LinkedHashMap`　C. `TreeMap`　D. 都可以
 
-> 答：
+> 答：C
 
 **B4.** 统计词频时，`map.getOrDefault(w, 0) + 1` 的含义是：
 A. 取 w 的值，取不到就当 0，再加 1　B. 取 w 的值加 1 后作为默认值　C. 删掉 w 再放 1　D. 返回 0
 
-> 答：
+> 答：A
 
 **B5.** `HashMap` 扩容的触发条件是：
 A. `size` 达到数组长度　B. `size` 超过 `数组长度 × 0.75`　C. 链表长度到 8　D. 每次 `put` 都扩
 
-> 答：
+> 答：B
 
 ### C. 简答（3 题）
 
 **C1.** 用自己的话说清 `HashMap.put(key, value)` 的完整过程（从算哈希到覆盖或追加）。
 
-> 答：
+> 答：先根据key值算哈希在桶查找，找不到则加入value，若桶已有元素，计算哈希冲突，equals则覆盖，反之追加链表尾
 
 **C2.** 为什么遍历 HashMap 推荐 `entrySet()` 而不是 `keySet()` + `get()`？
 
-> 答：
+> 答：entryset()一次查找，keyset()+get()要先查抄key值，再get出来
 
 **C3.** `HashMap`、`LinkedHashMap`、`TreeMap` 分别什么场景用？各一句。
 
-> 答：
+> 答：hashmap为默认，只根据key查值用。linkedhashmap为记录默认顺序并根据key查值。treemap为按key排序，无法插null
 
 <details>
 <summary>参考答案</summary>

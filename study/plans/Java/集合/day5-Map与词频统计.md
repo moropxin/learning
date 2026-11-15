@@ -258,7 +258,7 @@ System.out.println(map);   // {10=a, 20=b, 30=c}  —— 按 key 升序
 **B1.** `map.put("a", 2)` 当 key "a" 已存在时，返回值是：
 A. 新值 2　B. 旧值　C. `null`　D. 抛异常
 
-> 答：A
+> 答：B
 
 **B2.** 同时遍历 key 和 value，最高效的方式是：
 A. `keySet()` + `get()`　B. `values()`　C. `entrySet()`　D. `forEach` 里 `get()`
@@ -284,15 +284,15 @@ A. `size` 达到数组长度　B. `size` 超过 `数组长度 × 0.75`　C. 链�
 
 **C1.** 用自己的话说清 `HashMap.put(key, value)` 的完整过程（从算哈希到覆盖或追加）。
 
-> 答：先根据key值算哈希在桶查找，找不到则加入value，若桶已有元素，计算哈希冲突，equals则覆盖，反之追加链表尾
+> 答：先根据key值算哈希在桶查找，找不到则加入value，若桶已有元素，计算哈希冲突，equals则覆盖，反之追加链表尾,不同尾插判断是否树化(size>=8 and array>=64),再判断扩容(size>容量*0.75)
 
 **C2.** 为什么遍历 HashMap 推荐 `entrySet()` 而不是 `keySet()` + `get()`？
 
-> 答：entryset()一次查找，keyset()+get()要先查抄key值，再get出来
+> 答：entryset()一次查找得到对象，keyset()+get()要先通过key查找一次value值，再get一次判断hashcode和equals
 
 **C3.** `HashMap`、`LinkedHashMap`、`TreeMap` 分别什么场景用？各一句。
 
-> 答：hashmap为默认，只根据key查值用。linkedhashmap为记录默认顺序并根据key查值。treemap为按key排序，无法插null
+> 答：hashmap为默认，只根据key查值用。linkedhashmap为记录插入顺序并根据key查值。treemap为按key排序，无法插null但可以比较
 
 <details>
 <summary>参考答案</summary>

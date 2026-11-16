@@ -247,19 +247,19 @@ List<Map.Entry<String, Integer>> top2 = count.entrySet().stream()
 
 **A1.** `Stream` 的 `filter` 方法执行后，会立刻遍历集合。
 
-> 答：对
+> 答：错，filter是中间操作，不会立刻执行，等到调用终结操作后才遍历
 
 **A2.** 同一个 `Stream` 对象可以被 `forEach` 两次。
 
-> 答：不能，被foreach终结操作后Stream流已经结束了
+> 答：错，被foreach终结操作后Stream流已经结束了
 
 **A3.** `list.stream()` 会修改原 `List` 的内容。
 
-> 答：错，stream流只是视图案例，不对list进行修改
+> 答：错，stream流只是视图案例，不对list进行修改，除非在lambda里自行修改元素对象
 
 **A4.** `Comparator` 是函数式接口，所以可以用 Lambda 表示。
 
-> 答：对
+> 答：对，@FunctionalInterface标注的接口只有一个抽象方法，就支持lambda简写
 
 ### B. 选择（3 题）
 
@@ -276,13 +276,13 @@ A. `groupBy`　B. `Collectors.groupingBy`　C. `partitioningBy`　D. `map`
 **B3.** 下列 Lambda 写法正确的是：
 A. `(a, b) -> { a + b }`　B. `a, b -> a + b`　C. `(a, b) -> a + b`　D. `(a; b) -> a + b`
 
-> 答：A
+> 答：C
 
 ### C. 简答（3 题）
 
 **C1.** 用自己的话说：为什么 `Comparator` 能写成 Lambda？
 
-> 答：因为comparator只有单一接口，
+> 答：因为comparator是函数式接口，里面只有一个抽象方法，可以简化
 
 **C2.** Stream 的中间操作"惰性"是什么意思？举一个体现它的例子。
 
@@ -293,7 +293,8 @@ A. `(a, b) -> { a + b }`　B. `a, b -> a + b`　C. `(a, b) -> a + b`　D. `(a; b
 
 **C3.** 一个 `for` 循环和一个 Stream 链式调用，你什么时候用哪个？
 
-> 答：
+> 答：当业务是数据筛选，转换，归集的时候，代码想简洁，可读性高，适合集合的Stream链式
+>     当逻辑复杂，有多层循环嵌套，需要索引，break追求性能的时候用for循环
 
 ## 9. 复盘闭卷小测（25 分钟，10 题，不许翻笔记）
 
@@ -301,43 +302,43 @@ A. `(a, b) -> { a + b }`　B. `a, b -> a + b`　C. `(a, b) -> a + b`　D. `(a; b
 
 **1.** `ArrayList` 默认初始容量是多少？扩容几倍？
 
-> 答：
+> 答：初始容量为null(懒初始化)，扩容1.5倍
 
 **2.** `LinkedList.get(500)` 的时间复杂度是多少？为什么？
 
-> 答：
+> 答：O(n),因为没有下标索引，所以要折半查找
 
 **3.** `for (String s : list) { list.remove(s); }` 为什么会抛异常？异常全名是什么？
 
-> 答：
+> 答：因为remove操作无法在foreach里实现，modcount和expectmodcount无法同步对齐
 
 **4.** 泛型在什么时候被擦除成什么？因此哪两件事不能做？
 
-> 答：
+> 答：在程序运行时擦除成Object或上界，不能new一个泛型对象、不能用普通类型
 
 **5.** 自定义对象放进 `HashSet` 要重写哪两个方法？只写一个会怎样？
 
-> 答：
+> 答：equals和hashcode，只写一个会导致key和hash值对不齐，无法去重
 
 **6.** `HashSet` 判断元素重复的条件是什么？
 
-> 答：
+> 答：hashcode相同且equals不同
 
 **7.** `HashMap.put` 在 key 已存在时返回什么？
 
-> 答：
+> 答：返回被覆盖的旧值
 
 **8.** 遍历 `HashMap` 为什么推荐 `entrySet()`？
 
-> 答：
+> 答：因为只需一次抽出，getkey（)+get（）要抽出value再检查key
 
 **9.** `TreeMap` 和 `HashMap` 的三个区别。
 
-> 答：
+> 答：treemap底层为红黑树，hashmap底层为哈希表；treemap的key值要能比较且不能null，hashmap可以；treemap时间性能为O(logn),hashmap时间性能为O(1)
 
 **10.** Stream 的"创建 / 中间 / 终结"各举两个方法。
 
-> 答：
+> 答：`stream()`、`Stream.of()`；中间：`filter`、`map`（还有 `distinct`/`sorted`/`limit`）；终结：`collect`、`forEach`（还有 `count`/`findFirst`/`reduce`）。
 
 ## 10. 错题回炉表（做完小测再填）
 

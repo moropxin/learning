@@ -247,46 +247,49 @@ List<Map.Entry<String, Integer>> top2 = count.entrySet().stream()
 
 **A1.** `Stream` 的 `filter` 方法执行后，会立刻遍历集合。
 
-> 答：
+> 答：对
 
 **A2.** 同一个 `Stream` 对象可以被 `forEach` 两次。
 
-> 答：
+> 答：不能，被foreach终结操作后Stream流已经结束了
 
 **A3.** `list.stream()` 会修改原 `List` 的内容。
 
-> 答：
+> 答：错，stream流只是视图案例，不对list进行修改
 
 **A4.** `Comparator` 是函数式接口，所以可以用 Lambda 表示。
 
-> 答：
+> 答：对
 
 ### B. 选择（3 题）
 
 **B1.** 下列哪个是**终结操作**：
 A. `filter`　B. `map`　C. `sorted`　D. `collect`
 
-> 答：
+> 答：D
 
 **B2.** 把 `List<Student>` 按班级分组，应该用：
 A. `groupBy`　B. `Collectors.groupingBy`　C. `partitioningBy`　D. `map`
 
-> 答：
+> 答：B
 
 **B3.** 下列 Lambda 写法正确的是：
 A. `(a, b) -> { a + b }`　B. `a, b -> a + b`　C. `(a, b) -> a + b`　D. `(a; b) -> a + b`
 
-> 答：
+> 答：A
 
 ### C. 简答（3 题）
 
 **C1.** 用自己的话说：为什么 `Comparator` 能写成 Lambda？
 
-> 答：
+> 答：因为comparator只有单一接口，
 
 **C2.** Stream 的中间操作"惰性"是什么意思？举一个体现它的例子。
 
-> 答：
+> 答：中间操作在终结操作未存在时不会真正实施，这是惰性状态
+>     student.stream()
+>     .filter( s -> s >= 69 )
+>     //若此处未有终结操作，则中间操作一直处于惰性状态，不会执行
 
 **C3.** 一个 `for` 循环和一个 Stream 链式调用，你什么时候用哪个？
 

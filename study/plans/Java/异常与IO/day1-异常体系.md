@@ -236,45 +236,45 @@ Exception in thread "main" java.lang.NumberFormatException: For input string: "a
 
 **A1.** `Error` 和 `Exception` 都继承自 `Throwable`。
 
-> 答：
+> 答：对
 
 **A2.** `RuntimeException` 必须被 `try-catch` 或 `throws` 处理，否则编译不通过。
 
-> 答：
+> 答：错，运行错误不一定硬处理
 
 **A3.** `finally` 块中的代码在任何情况下都会执行。
 
-> 答：
+> 答：错，在JVM系统出现崩溃时或者System.exit()时不执行，其他情况都会执行
 
 **A4.** 多个 `catch` 时，父类异常要写在子类前面。
 
-> 答：
+> 答：错，子类在前，父类要在后面，
 
 **A5.** `throws` 后面跟的是异常对象，`throw` 后面跟的是异常类名。
 
-> 答：
+> 答：错，throws跟的是异常类名，throw跟的是异常对象
 
 ### B. 选择（5 题）
 
 **B1.** 下列哪个是**编译时异常**：
 A. `NullPointerException`　B. `ArrayIndexOutOfBoundsException`　C. `IOException`　D. `ArithmeticException`
 
-> 答：
+> 答：C
 
 **B2.** `int a = 10 / 0;` 会抛：
 A. `NullPointerException`　B. `ArithmeticException`　C. `NumberFormatException`　D. `IllegalArgumentException`
 
-> 答：
+> 答：B
 
 **B3.** 关于 `finally`，正确的是：
 A. 只有 try 成功才执行　B. 只有 catch 执行了才执行　C. 无论是否抛异常都会执行　D. 只能写 `return`
 
-> 答：
+> 答：C
 
 **B4.** `throw new RuntimeException("x")` 应该写在：
 A. 方法签名上　B. 方法体内部　C. 类声明上　D. catch 块外
 
-> 答：
+> 答：B
 
 **B5.** 下面代码的输出是：
 ```java
@@ -285,21 +285,21 @@ static int f() {
 ```
 A. 1　B. 2　C. 编译报错　D. 运行时异常
 
-> 答：
+> 答：B
 
 ### C. 简答（3 题）
 
 **C1.** 用自己的话说清"编译时异常"和"运行时异常"的区别（不要只说"一个要处理一个不用"，要说**为什么**）。
 
-> 答：
+> 答：编译异常时通常为外部数据源，互联网，JVM系统崩溃等原因导致，程序无法正常运行，要强制处理，不catch不throw的话系统无法显式决定怎么处理程序。运行异常通常为代码出现逻辑或语法等错误，当修改代码后问题消失，因此不强制处理
 
 **C2.** `finally` 里写 `return` 会有什么问题？为什么建议不要在 `finally` 里 `return`？
 
-> 答：
+> 答：finally里写return会覆盖try和catch的异常报错和返回的基本数据类型，finally只做释放资源和关闭流的作用
 
 **C3.** 什么时候用 `try-catch` 自己处理，什么时候用 `throws` 往上抛？各举一个场景。
 
-> 答：
+> 答：能就地补救，知道问题出现在哪，用try-catch。当出现问题处理不了需要往上级扔的用throws，另外"参数非法"这类应由调用方保证的错误，直接 `throw newIllegalArgumentException(...)`，不要让它带着脏数据继续跑。
 
 <details>
 <summary>参考答案</summary>

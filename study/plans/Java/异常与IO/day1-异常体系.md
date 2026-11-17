@@ -5,6 +5,9 @@
 > 今天要拿到两样东西：**① 看到一段 `Exception in thread "main" ...` 的红色报错，能立刻说出"是什么、在哪、怎么修"；② 知道什么时候该 catch、什么时候该 throws。**
 > 异常是后面所有框架代码的"必备阅读能力"——Spring 的 `GlobalExceptionHandler`、MyBatis 的 `PersistenceException`，全是这套东西。
 
+> 🧩 **本文代码块约定（从今天起所有讲义都这样写）**：每个 `java` 代码块都是**一份完整、可直接运行的文件**——开头一行 `// 文件：XxxDemo.java` 注明文件名，`import` 齐全、有 `class`、有 `main`、结尾用 `// 输出：` 给出真实运行结果。做法：复制 → 存成同名 `.java` → 运行，不需要自己补任何上下文。
+> 只有极少数纯语法示意才用「片段」标记，并写明粘到哪里。
+
 ## 0. 今天会遇到的 8 个名词
 
 | 名词 | 一句话人话 | 类比 |
@@ -32,30 +35,65 @@
 假设用"返回错误码"表示失败：
 
 ```java
-// 每个方法都要返回 int 表示成功/失败，真正的结果只能塞进参数里
-int readFile(String path, StringBuilder out) {
-    if (!new File(path).exists()) {
-        return -1;      // 文件不存在
-    }
-    // ... 读文件
-    if (读取失败) {
-        return -2;      // 读失败
-    }
-    return 0;           // 成功
-}
+// 文件：ReturnCodeDemo.java —— 整份复制成文件即可运行
+import java.io.File;
 
-// 调用方：必须一层层判断，代码全是 if
-int code = readFile("a.txt", sb);
-if (code == -1) { ... }
-else if (code == -2) { ... }
+public class ReturnCodeDemo {
+
+    // 用 int 表示成败：-1 文件不存在，-2 读失败，0 成功
+    // 真正的结果只能通过参数塞回去
+    static int readFile(String path, StringBuilder out) {
+        if (!new File(path).exists()) {
+            return -1;
+        }
+        out.append("文件内容（示例）");
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder();
+        int code = readFile("a.txt", sb);
+
+        // 调用方：每调一次就要判一次，正常逻辑被 if 淹没
+        if (code == -1) {
+            System.out.println("文件不存在");
+        } else if (code == -2) {
+            System.out.println("读失败");
+        } else {
+            System.out.println("读到：" + sb);
+        }
+    }
+}
+// 输出：文件不存在
 ```
 
 问题：**正常逻辑被错误处理淹没了**，而且错误码没有上下文（哪个文件？哪一行？）。
 
-异常的解法：**正常逻辑照常写，出问题就"抛"出去，让上层统一处理**。
+异常的解法：**正常逻辑照常写，出问题就"抛"出去，让上层统一处理**：
 
 ```java
-String content = readFile("a.txt");   // 出问题会抛异常，这里不用写 if
+// 文件：ExceptionDemo.java —— 整份复制成文件即可运行
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+public class ExceptionDemo {
+
+    // 出问题直接抛；正常路径只有一行
+    static String read(String path) throws IOException {
+        return Files.readString(Path.of(path));   // 文件不存在抛 NoSuchFileException（IOException 子类）
+    }
+
+    public static void main(String[] args) {
+        try {
+            String content = read("a.txt");       // 这里不写任何 if
+            System.out.println(content);
+        } catch (IOException e) {                 // 统一在一处处理
+            System.out.println("读文件失败：" + e.getMessage());
+        }
+    }
+}
+// 输出：读文件失败：a.txt        （JDK 17 的消息是：a.txt）
 ```
 
 ## 3. 异常体系（一张图记住）
@@ -87,29 +125,41 @@ flowchart TD
 ## 4. try-catch 的三种写法
 
 ```java
-// 写法 1：单个 catch
-try {
-    int a = 10 / 0;               // ArithmeticException
-} catch (ArithmeticException e) {
-    System.out.println("除以零了：" + e.getMessage());
-}
+// 文件：TryCatchDemo.java —— 整份复制成文件即可运行，三段按顺序执行
+public class TryCatchDemo {
 
-// 写法 2：多个 catch（从子类到父类，顺序不能反！）
-try {
-    String s = null;
-    s.length();                   // NullPointerException
-} catch (NullPointerException e) {
-    System.out.println("空指针");
-} catch (RuntimeException e) {     // 父类放后面，否则前面的永远执行不到
-    System.out.println("其他运行时异常");
-}
+    public static void main(String[] args) {
 
-// 写法 3：一个 catch 捕获多个（JDK7+，用 | 分隔）
-try {
-    Integer.parseInt("abc");      // NumberFormatException
-} catch (NumberFormatException | NullPointerException e) {
-    System.out.println("数字格式或空指针：" + e);
+        // ---- 写法 1：单个 catch ----
+        try {
+            int a = 10 / 0;                       // ArithmeticException
+            System.out.println(a);                // 不会执行
+        } catch (ArithmeticException e) {
+            System.out.println("除以零了：" + e.getMessage());
+        }
+
+        // ---- 写法 2：多个 catch（子类在前，父类在后，顺序不能反）----
+        try {
+            String s = null;
+            s.length();                           // NullPointerException
+        } catch (NullPointerException e) {
+            System.out.println("空指针");
+        } catch (RuntimeException e) {            // 父类必须放后面，否则编译报错
+            System.out.println("其他运行时异常");
+        }
+
+        // ---- 写法 3：一个 catch 捕获多个（JDK7+，用 | 分隔）----
+        try {
+            Integer.parseInt("abc");              // NumberFormatException
+        } catch (NumberFormatException | NullPointerException e) {
+            System.out.println("数字格式或空指针：" + e);
+        }
+    }
 }
+// 输出：
+// 除以零了：/ by zero
+// 空指针
+// 数字格式或空指针：java.lang.NumberFormatException: For input string: "abc"
 ```
 
 **顺序铁律**：多个 `catch` 必须**子类在前、父类在后**。反过来编译器直接报错（"已捕获该异常"），因为父类会吞掉子类。
@@ -117,15 +167,23 @@ try {
 ## 5. finally：不管出没出事都要执行
 
 ```java
-try {
-    System.out.println("打开资源");
-    int x = 1 / 0;                 // 抛异常
-    System.out.println("这行不会执行");
-} catch (ArithmeticException e) {
-    System.out.println("捕获到异常");
-} finally {
-    System.out.println("finally 一定执行");   // 会执行
+// 文件：FinallyOrderDemo.java —— 整份复制成文件即可运行
+public class FinallyOrderDemo {
+
+    public static void main(String[] args) {
+        try {
+            System.out.println("1. 打开资源");
+            int x = 1 / 0;                        // 抛 ArithmeticException
+            System.out.println("2. 这行不会执行");
+        } catch (ArithmeticException e) {
+            System.out.println("3. 捕获到异常");
+        } finally {
+            System.out.println("4. finally 一定执行");
+        }
+        System.out.println("5. try-catch-finally 之后的代码");
+    }
 }
+// 输出：1 → 3 → 4 → 5
 ```
 
 执行顺序：**try 里出错 → 跳到 catch → 再执行 finally**。即使 try 里有 `return`，`finally` 也会在返回前执行。
@@ -133,34 +191,48 @@ try {
 **三个必做的实验（今天动手部分的核心）**：
 
 ```java
-// 实验 1：finally 里 return，会覆盖 try 里的 return
-static int f1() {
-    try {
-        return 1;
-    } finally {
-        return 2;       // 返回值变成 2！
-    }
-}
+// 文件：FinallyReturnDemo.java —— 整份复制成文件即可运行，三个实验一次跑完
+public class FinallyReturnDemo {
 
-// 实验 2：finally 修改基本类型变量，不影响已经确定的返回值
-static int f2() {
-    int x = 1;
-    try {
-        return x;       // 这里已经把 1 存进"返回槽"
-    } finally {
-        x = 2;          // 改了也没用，返回的仍是 1
+    // 实验 1：finally 里 return，会覆盖 try 里的 return
+    static int f1() {
+        try {
+            return 1;
+        } finally {
+            return 2;                 // 最终返回 2，try 的 1 被覆盖
+        }
     }
-}
 
-// 实验 3：但改"引用指向的对象内容"是有效的
-static StringBuilder f3() {
-    StringBuilder sb = new StringBuilder("A");
-    try {
-        return sb;
-    } finally {
-        sb.append("B");  // 对象内容被改了，返回的是 "AB"
+    // 实验 2：finally 修改基本类型变量，不影响已经确定的返回值
+    static int f2() {
+        int x = 1;
+        try {
+            return x;                 // 1 已经被读进"返回值槽"
+        } finally {
+            x = 2;                    // 改的是局部变量，返回的仍是 1
+        }
+    }
+
+    // 实验 3：改"引用指向的对象内容"是有效的
+    static StringBuilder f3() {
+        StringBuilder sb = new StringBuilder("A");
+        try {
+            return sb;                // 返回的是引用，此时 sb 内容是 "A"
+        } finally {
+            sb.append("B");           // 同一个对象被改，外面看到 "AB"
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("f1() = " + f1());
+        System.out.println("f2() = " + f2());
+        System.out.println("f3() = " + f3());
     }
 }
+// 输出：
+// f1() = 2
+// f2() = 1
+// f3() = AB
 ```
 
 > **结论**：`finally` 里**不要写 `return`**（会吞掉异常、覆盖返回值，是出 bug 的经典源头）。`finally` 只用来做"关资源"。
@@ -173,18 +245,45 @@ static StringBuilder f3() {
 | `throws` | **方法签名上** | 声明"我这个方法可能会抛这些异常"，把锅甩给调用者 | 异常**类名**，可多个：`throws IOException, SQLException` |
 
 ```java
-// throws：声明，不一定真抛
-public void read(String path) throws IOException {
-    FileInputStream in = new FileInputStream(path);   // 这里可能抛 IOException
-    // 我不处理，交给调用我的人
-}
+// 文件：ThrowThrowsDemo.java —— 整份复制成文件即可运行
+import java.io.FileInputStream;
+import java.io.IOException;
 
-// throw：真的抛出去
-public void check(int age) {
-    if (age < 0) {
-        throw new IllegalArgumentException("年龄不能为负：" + age);   // 主动中断
+public class ThrowThrowsDemo {
+
+    // throws：只是声明"我可能抛 IOException"，自己不处理，甩给调用者
+    static void read(String path) throws IOException {
+        FileInputStream in = new FileInputStream(path);   // 文件不存在会抛
+        in.close();                                       // 明天用 try-with-resources 改写
+    }
+
+    // throw：真的抛出去，方法立即中断
+    static void check(int age) {
+        if (age < 0) {
+            throw new IllegalArgumentException("年龄不能为负：" + age);
+        }
+        System.out.println("年龄合法：" + age);
+    }
+
+    public static void main(String[] args) {
+        // throws 的异常，最终必须有人 catch
+        try {
+            read("nothing.txt");
+        } catch (IOException e) {
+            System.out.println("调用者接住了：" + e.getClass().getSimpleName());
+        }
+
+        // throw 的异常同样可以在这里接住
+        try {
+            check(-1);
+        } catch (IllegalArgumentException e) {
+            System.out.println("接住主动抛的异常：" + e.getMessage());
+        }
     }
 }
+// 输出：
+// 调用者接住了：FileNotFoundException
+// 接住主动抛的异常：年龄不能为负：-1
 ```
 
 **选择原则**：
@@ -217,8 +316,34 @@ Exception in thread "main" java.lang.NumberFormatException: For input string: "a
 分别制造并捕获：`NullPointerException`（调 null 的方法）、`ArrayIndexOutOfBoundsException`（越界取数组）、`ClassCastException`（强转错误类型）、`NumberFormatException`（`Integer.parseInt("abc")`）、`ArithmeticException`（整除零）。
 每个 catch 里打印三句话：**是什么、为什么会发生、怎么修**。
 
+直接从这个骨架改（已给第 1 个，其余 4 个照抄结构替换即可）：
+
+```java
+// 文件：FiveExceptions.java
+public class FiveExceptions {
+
+    public static void main(String[] args) {
+
+        // 1. NullPointerException
+        try {
+            String s = null;
+            s.length();
+        } catch (NullPointerException e) {
+            System.out.println("【是什么】空指针异常");
+            System.out.println("【为什么】对一个 null 的对象调用了方法，s 没有指向任何对象");
+            System.out.println("【怎么修】调用前判空，或确保对象一定被赋值");
+        }
+
+        // 2. ArrayIndexOutOfBoundsException —— 照上面结构写
+        // 3. ClassCastException
+        // 4. NumberFormatException
+        // 5. ArithmeticException
+    }
+}
+```
+
 **任务 B：finally 三个实验（15 分钟）**
-把 §5 的 `f1` / `f2` / `f3` 抄下来跑一遍，把实际输出写进笔记，并用自己的话解释 `f2` 为什么返回 1。
+把 §5 的 `FinallyReturnDemo.java` 整份复制运行一遍（不用自己拼方法），把实际输出写进笔记，并用自己的话解释 `f2` 为什么返回 1。
 
 **任务 C：读报错（10 分钟）**
 故意写一个第 20 行越界的代码，运行，从红色报错里找出**你自己的类名 + 行号**，抄进笔记。

@@ -440,10 +440,10 @@ public class SuppressedDemo {
 
 **验收标准**
 
-- [ ] 能说出自定义异常为什么常继承 `RuntimeException`
-- [ ] 能说出包装异常时必须传 `cause`，不传会丢什么
-- [ ] 能说出 `try (...)` 里能放什么类型的对象（`AutoCloseable`）
-- [ ] 能说出多个资源的关闭顺序，以及"抑制异常"是什么
+- [T] 能说出自定义异常为什么常继承 `RuntimeException`
+- [T] 能说出包装异常时必须传 `cause`，不传会丢什么
+- [T] 能说出 `try (...)` 里能放什么类型的对象（`AutoCloseable`）
+- [T] 能说出多个资源的关闭顺序，以及"抑制异常"是什么
 
 ## 9. 练习（先写，再看答案）
 
@@ -451,64 +451,66 @@ public class SuppressedDemo {
 
 **A1.** 自定义异常必须继承 `Exception`，不能继承 `RuntimeException`。
 
-> 答：
+> 答：错，继承RuntimeException时异常可以给前端、日志返回异常，可自行决定扔不扔
 
 **A2.** 抛出 `RuntimeException` 的子类时，调用方不写 `try-catch` 也能编译通过。
 
-> 答：
+> 答：对，为运行异常，编译期可通过
 
 **A3.** 把 `IOException` 包装成 `BusinessException` 时，如果不传 `cause`，原始异常信息就丢了。
 
-> 答：
+> 答：对，会上升为父类异常
 
 **A4.** `try (A a = new A(); B b = new B())` 的关闭顺序是先关闭 `A` 再关闭 `B`。
 
-> 答：
+> 答：错，逆序关闭，先开A后B，再闭B后A
 
 **A5.** 只有实现了 `AutoCloseable` 接口的对象才能放进 `try (...)`。
 
-> 答：
+> 答：对，Closeable是其子接口
 
 ### B. 选择（5 题）
 
 **B1.** 下面哪个最适合做业务异常：
 A. 继承 `Error`　B. 继承 `RuntimeException`　C. 继承 `Throwable`　D. 直接用 `Exception`
 
-> 答：
+> 答：B
 
 **B2.** `throw new BusinessException("余额不足", e)` 中 `e` 的作用是：
 A. 覆盖原异常　B. 作为 cause 保留根因　C. 打印日志　D. 无关参数
 
-> 答：
+> 答：B
 
 **B3.** `try (Res a = new Res()) { ... }` 结束时自动调用：
 A. `a.finalize()`　B. `a.close()`　C. `a.flush()`　D. 什么都不调
 
-> 答：
+> 答：B
 
 **B4.** 多个资源正确关闭顺序是：
 A. 与声明顺序相同　B. 与声明顺序相反　C. 随机　D. 由 JVM 决定
 
-> 答：
+> 答：B
 
 **B5.** 主异常抛出后 `close()` 也抛异常，结果是：
 A. `close()` 的异常覆盖主异常　B. 主异常保留，`close()` 异常进入 `getSuppressed()`　C. 两个都丢失　D. 编译报错
 
-> 答：
+> 答：A
 
 ### C. 简答（3 题）
 
 **C1.** 为什么业务异常通常继承 `RuntimeException` 而不是 `Exception`？
 
-> 答：
+> 答：业务异常时通常为用户操作不当导致的异常，这类异常出现的很频繁，当用Exception时从Service到Colltroller层都要throws自定义异常，代码非常不清晰，而出现运行异常时往往只有全局异常处理器才能处理。所以用RuntimeException后调用方随时可接，统一由`@RestControllerAdvice` 转成 JSON，职责最清晰
 
 **C2.** 异常包装时为什么必须传 `cause`？不传会怎样？
 
-> 答：
+> 答：cause里保存的是异常对象、留下异常根，方便日志追踪和异常排查。不传的话底层异常会丢失，当程序出现异常时会无法追踪排查到根本异常原因
 
 **C3.** `try-with-resources` 相比手写 `finally` 关资源，好在哪三点？
 
-> 答：
+> 答：N1.不用写finally结构，不用判空
+>     N2.可多开流，各个流自动按次序开关
+>     N3.不会吞主异常，close()抛的异常会作为抑制异常挂在主异常getSuppressed()上，两者留痕。手写finall时会覆盖业务异常，只有close()异常日志
 
 <details>
 <summary>参考答案</summary>

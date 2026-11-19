@@ -446,10 +446,10 @@ public class ChineseByteDemo {
 
 **验收标准**
 
-- [ ] 能说出 `File` 对象和磁盘文件的关系（对象存在 ≠ 文件存在）
-- [ ] 能说出 `read()` 为什么返回 `int`、`-1` 代表什么
-- [ ] 能用缓冲区完成文件复制，并说出 `write(buf, 0, len)` 里为什么是 `len`
-- [ ] 能说出字节流读中文为什么乱码
+- [T] 能说出 `File` 对象和磁盘文件的关系（对象存在 ≠ 文件存在）
+- [T] 能说出 `read()` 为什么返回 `int`、`-1` 代表什么
+- [T] 能用缓冲区完成文件复制，并说出 `write(buf, 0, len)` 里为什么是 `len`
+- [T] 能说出字节流读中文为什么乱码
 
 ## 9. 练习（先写，再看答案）
 
@@ -457,64 +457,65 @@ public class ChineseByteDemo {
 
 **A1.** `new File("a.txt")` 会在磁盘上创建一个空文件。
 
-> 答：
+> 答：错，new只是路径对象，不会碰磁盘
 
 **A2.** `FileInputStream.read()` 读到文件末尾时返回 `-1`。
 
-> 答：
+> 答：对，因为read返回int类型数据，当-1时停止
 
 **A3.** `dir.listFiles()` 在目录不存在时返回长度为 0 的数组。
 
-> 答：
+> 答：错，返回null不是空数组
 
 **A4.** `out.write(buf, 0, len)` 中的 `len` 必须使用 `read()` 返回的值，不能写 `buf.length`。
 
-> 答：
+> 答：对，若返回length，上个缓冲区可能还有残留会读进来
 
 **A5.** 字节流既能读文本文件也能读图片，但读中文文本时需要按编码解码。
 
-> 答：
+> 答：对
 
 ### B. 选择（5 题）
 
 **B1.** 要创建多级目录（`a/b/c`），应该用：
 A. `mkdir()`　B. `mkdirs()`　C. `createNewFile()`　D. `new File()` 构造
 
-> 答：
+> 答：B
 
 **B2.** `read(byte[] buf)` 的返回值表示：
 A. 缓冲区总长度　B. 本次实际读到的字节数，`-1` 表示结束　C. 文件总大小　D. 剩余字节数
 
-> 答：
+> 答：B
 
 **B3.** 复制文件时最推荐的做法是：
 A. 一次读一个字节　B. 一次读固定大小缓冲区的数据　C. 一次读整个文件　D. 用 `File.renameTo`
 
-> 答：
+> 答：B
 
 **B4.** 下面哪个流适合写二进制数据：
 A. `FileReader`　B. `FileWriter`　C. `FileOutputStream`　D. `BufferedReader`
 
-> 答：
+> 答：C
 
 **B5.** `try (FileInputStream in = ...)` 结束时自动调用：
 A. `in.flush()`　B. `in.close()`　C. `in.reset()`　D. 不调用
 
-> 答：
+> 答：B
 
 ### C. 简答（3 题）
 
 **C1.** `File` 对象存在，是否代表磁盘上文件存在？为什么？
 
-> 答：
+> 答：错，File只是一个路径的封装对象，不检查也不创建，要调用exists()/isfile()的方法才知道磁盘上文件是否存在
 
 **C2.** 复制文件时为什么必须用 `write(buf, 0, len)` 而不是 `write(buf)`？
 
-> 答：
+> 答：因为write(buf)会把整个8192字节全写出去，最后一次读到可能是只填满缓冲区的前len个字节，后面还是旧数据，write(buf, 0, len)可以精准限制读取范围，只写真正读到的len个字节
 
 **C3.** 用字节流读一段中文为什么会乱码？怎么解决？
 
-> 答：
+> 答：因为中文在UTF-8占3个字节、GBK占2个字节，一个汉字由多字节组成。字节流read()一次只取一个字节，把它单独强转为char就是拆开汉字去转，必定乱码。解决办法有两种：① 字节流读出全部字节后按编码整体解码 `new String(data, "UTF-8")`；② 直接用字符流 `FileReader` / `InputStreamReader`（明天讲），它们内部会按编码把字节拼成字符。
+
 
 <details>
 <summary>参考答案</summary>

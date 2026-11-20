@@ -356,7 +356,7 @@ A. `false`　B. `true`　C. 文件名　D. 编码
 **B4.** 下面哪种情况**不会**产生乱码：
 A. UTF-8 写、GBK 读　B. GBK 写、GBK 读　C. UTF-8 写、Latin1 读　D. 字节流逐字节转 `char`
 
-> 答：D
+> 答：B
 
 **B5.** `close()` 和 `flush()` 的关系是：
 A. 完全一样　B. `close()` 会先 flush 再释放资源　C. `flush()` 会关闭流　D. `close()` 不刷缓冲区
@@ -368,7 +368,7 @@ A. 完全一样　B. `close()` 会先 flush 再释放资源　C. `flush()` 会�
 **C1.** 为什么 `FileReader` 读 UTF-8 文件在某些机器上会乱码？
 
 > 答：因为filereader用的底层方法是Charset.defaultCharset()，该方法会读取系统默认编码，在windows机器上默认为GBK编码，读utf-8文件就会出现乱码，而当在linux/macos系统上默认为UTF-8，读GBK文件会出现乱码。
-> 因此在生成环境中读取文件要根据系统自调编码
+> 因此在生成环境中读取文件不能依赖系统默认，要写死StandardCharsets.UTF_8
 
 **C2.** 乱码的根本原因是什么？你排查一个乱码文件会按什么顺序做？
 

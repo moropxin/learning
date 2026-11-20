@@ -307,10 +307,10 @@ public class GarbledDemo {
 
 **验收标准**
 
-- [ ] 能说出 UTF-8 和 GBK 下一个汉字各占几字节
-- [ ] 能说出 `FileReader` 用的编码是什么（系统默认），以及为什么它会坑
-- [ ] 能写出 `new InputStreamReader(字节流, 编码)` 两行式
-- [ ] 能说出乱码的唯一原因和排查顺序
+- [T] 能说出 UTF-8 和 GBK 下一个汉字各占几字节
+- [T] 能说出 `FileReader` 用的编码是什么（系统默认），以及为什么它会坑
+- [T] 能写出 `new InputStreamReader(字节流, 编码)` 两行式
+- [T] 能说出乱码的唯一原因和排查顺序
 
 ## 9. 练习（先写，再看答案）
 
@@ -318,64 +318,70 @@ public class GarbledDemo {
 
 **A1.** `FileReader` 默认使用 UTF-8 编码读取文件。
 
-> 答：
+> 答：错，用GBK读取文件，遇到中文会编码错误出现乱码
 
 **A2.** 一个汉字在 UTF-8 中固定占 3 个字节。
 
-> 答：
+> 答：错，一些生僻字和emoji会占四个字节
 
 **A3.** `flush()` 之后流就被关闭了，不能再写。
 
-> 答：
+> 答：错，flush之后缓存区会被冲到磁盘，流还没被关闭
 
 **A4.** `new FileWriter(file)` 会清空原文件内容。
 
-> 答：
+> 答：对，，需要new FileWriter(file,ture)的追加模式才不会清空原文件
 
 **A5.** 用 `InputStreamReader` 可以指定任意字符集，从而正确读取 GBK 文件。
 
-> 答：
+> 答：对
 
 ### B. 选择（5 题）
 
 **B1.** 一个汉字在 GBK 编码下占几个字节：
 A. 1　B. 2　C. 3　D. 4
 
-> 答：
+> 答：B
 
 **B2.** 要把 GBK 文件转成 UTF-8，正确的组合是：
 A. `FileReader` + `FileWriter`　B. `InputStreamReader(GBK)` + `OutputStreamWriter(UTF-8)`　C. `FileInputStream` + `FileOutputStream`　D. `BufferedReader` + `BufferedWriter`
 
-> 答：
+> 答：B
 
 **B3.** `FileWriter` 以追加模式打开文件，构造器第二个参数应为：
 A. `false`　B. `true`　C. 文件名　D. 编码
 
-> 答：
+> 答：B
 
 **B4.** 下面哪种情况**不会**产生乱码：
 A. UTF-8 写、GBK 读　B. GBK 写、GBK 读　C. UTF-8 写、Latin1 读　D. 字节流逐字节转 `char`
 
-> 答：
+> 答：D
 
 **B5.** `close()` 和 `flush()` 的关系是：
 A. 完全一样　B. `close()` 会先 flush 再释放资源　C. `flush()` 会关闭流　D. `close()` 不刷缓冲区
 
-> 答：
+> 答：B
 
 ### C. 简答（3 题）
 
 **C1.** 为什么 `FileReader` 读 UTF-8 文件在某些机器上会乱码？
 
-> 答：
+> 答：因为filereader用的底层方法是Charset.defaultCharset()，该方法会读取系统默认编码，在windows机器上默认为GBK编码，读utf-8文件就会出现乱码，而当在linux/macos系统上默认为UTF-8，读GBK文件会出现乱码。
+> 因此在生成环境中读取文件要根据系统自调编码
 
 **C2.** 乱码的根本原因是什么？你排查一个乱码文件会按什么顺序做？
 
-> 答：
+> 答：写入的字节序列用错误的编码去解码，或者按字节切割了多字节字符。
+> N1.先用16进制或文本工具查看当前文件编码
+> N2.检查生产环境读入代码用的编码是默认还是显式指定
+> N3.统一转换为统一编码进行解码编码
+> N4.确认没有用字节流逐字转char（会导致无法完整读取字符编码，将其拆解）
 
 **C3.** 字节流和字符流分别适合什么场景？各举一例。
 
-> 答：
+> 答：字节流适合按字节搬运工作，用于对二进制文件、图片、视频、压缩包等搬运。
+>     字符流适合按字符搬运工作，用于csv日志、文本形式、写页面内容。
 
 <details>
 <summary>参考答案</summary>

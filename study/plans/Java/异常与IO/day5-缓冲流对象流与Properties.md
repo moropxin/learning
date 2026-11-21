@@ -425,11 +425,11 @@ public class ObjectListDemo {
 
 **验收标准**
 
-- [ ] 能解释缓冲流为什么快（减少系统调用），以及为什么必须 `close()`/`flush()`
-- [ ] 能写出"字节流 → InputStreamReader → BufferedReader"三层套娃并指定 UTF-8
-- [ ] 能说出 `readLine()` 的三点：不含换行、末行 `null`、要控编码用 `InputStreamReader`
-- [ ] 能说出 `transient`、`static`、`serialVersionUID` 三个东西的作用
-- [ ] 能用 `Properties.load(Reader)` 读出中文配置并 `getProperty(key, 默认值)`
+- [T] 能解释缓冲流为什么快（减少系统调用），以及为什么必须 `close()`/`flush()`
+- [T] 能写出"字节流 → InputStreamReader → BufferedReader"三层套娃并指定 UTF-8
+- [T] 能说出 `readLine()` 的三点：不含换行、末行 `null`、要控编码用 `InputStreamReader`
+- [T] 能说出 `transient`、`static`、`serialVersionUID` 三个东西的作用
+- [T] 能用 `Properties.load(Reader)` 读出中文配置并 `getProperty(key, 默认值)`
 
 ## 10. 练习（先写，再看答案）
 
@@ -437,54 +437,54 @@ public class ObjectListDemo {
 
 **A1.** `BufferedInputStream` 默认缓冲区大小是 8192 字节。
 
-> 答：
+> 答：对
 
 **A2.** `BufferedReader.readLine()` 返回的字符串包含行尾的换行符。
 
-> 答：
+> 答：错，不包含换行符
 
 **A3.** 使用了缓冲流之后，即使不 `close()` 也不会丢数据。
 
-> 答：
+> 答：错，缓冲区里的数据没close()或flush()也会丢数据
 
 **A4.** `transient` 修饰的字段在反序列化后是 `null`（对象类型）或默认值（基本类型）。
 
-> 答：
+> 答：对
 
 **A5.** 一个类只要实现了 `Serializable`，它的所有字段都能被序列化。
 
-> 答：
+> 答：错，transient和static字段修饰的变量不可被序列化
 
 ### B. 选择（5 题）
 
-**B1.** 缓冲流提速的根本原因是：
+**B1.** 缓冲流提速的根本原因是：B
 A. 数据压缩了　B. 减少了系统调用次数　C. 用了多线程　D. 跳过了解码
 
-**B2.** 要按行读一个 UTF-8 文件，正确的构造是：
+**B2.** 要按行读一个 UTF-8 文件，正确的构造是：B
 A. `new BufferedReader(new FileReader(f))`　B. `new BufferedReader(new InputStreamReader(new FileInputStream(f), StandardCharsets.UTF_8))`　C. `new FileReader(f)`　D. `new BufferedReader(new FileInputStream(f))`
 
-**B3.** 反序列化时抛出 `InvalidClassException`，最可能的原因是：
+**B3.** 反序列化时抛出 `InvalidClassException`，最可能的原因是：B
 A. 文件不存在　B. `serialVersionUID` 不一致　C. 类没有 `main` 方法　D. 字段是 `transient`
 
-**B4.** `Properties.getProperty(key, "默认值")` 在 key 不存在时返回：
+**B4.** `Properties.getProperty(key, "默认值")` 在 key 不存在时返回：C
 A. `null`　B. 空串　C. `"默认值"`　D. 抛异常
 
-**B5.** 用 `ObjectOutputStream` 连续写两个对象，读的时候必须：
+**B5.** 用 `ObjectOutputStream` 连续写两个对象，读的时候必须：B
 A. 按任意顺序读　B. 按写入顺序读　C. 只能读第一个　D. 先读 `null`
 
 ### C. 简答（3 题）
 
 **C1.** 缓冲流为什么快？为什么它必须 `flush()` 或 `close()`？
 
-> 答：
+> 答：因为缓冲区一次性搬运数据过去，相比于字节流来说read()的次数更少，因为缓冲区不满8kb的数据无法落盘，不手动落盘会随进程结束
 
 **C2.** `transient` 和 `static` 修饰的字段都不参与序列化，原因有什么不同？
 
-> 答：
+> 答：transient修饰类里的单个对象，只是那个对象不能参与序列化，而static是属于类而不属于对象，序列化保存的是对象快照，而静态字段在类加载里面就已经存在了，所有对象共享，存进每一个对象里会冗余也会在反序列化的时候产生歧义，所有static不提供序列化
 
 **C3.** 用 `Properties` 读配置文件时，为什么要用 `load(Reader)` 而不是 `load(InputStream)`？
 
-> 答：
+> 答：load(inputstream)按iso-8859-1解码，中文会变成乱码，而load(reader)由你自行指定编码，可以针对文件正确解码
 
 <details>
 <summary>参考答案</summary>

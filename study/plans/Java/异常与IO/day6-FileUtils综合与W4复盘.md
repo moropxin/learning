@@ -404,15 +404,16 @@ public class LogDemo {
 
 **1.（2 分）** `Error` 和 `Exception` 的区别是什么？举一个 `Error` 的例子。
 
-> 答：
+> 答：Error是JVN系统级别崩溃(`OutOfMemoryError`、`StackOverflowError`),程序通常无法恢复，Exception是编译级别错误，可以自行解决
 
 **2.（2 分）** 编译时异常和运行时异常，哪一个必须显式处理？为什么 Java 要这么设计？
 
-> 答：
+> 答：编译时异常必须显式处理，因为编译异常时程序无法正常运行
 
 **3.（2 分）** `try-with-resources` 相比手写 `finally` 里的 `close()`，好在哪两点？
 
-> 答：
+> 答：N1.自动按次序关闭资源，代码清晰简洁
+>     N2.close()抛异常不会覆盖主异常，会进getSussessed()
 
 **4.（2 分）** 下面这段代码最终输出什么？为什么？
 
@@ -422,31 +423,33 @@ static int f() {
 }
 ```
 
-> 答：
+> 答：输出2，因为对于try的基本类型变量，finally的return可以覆盖
 
 **5.（2 分）** 字节流和字符流的本质区别是什么？什么时候只能用字节流？
 
-> 答：
+> 答：字节流一个一个读字节，字符流一段一段读字节。读二进制、视频、图片等文件时
 
 **6.（2 分）** `new String(bytes, StandardCharsets.UTF_8)` 和 `new String(bytes)` 有什么区别？后者为什么会乱码？
 
-> 答：
+> 答：前者可指定编码样式，后者使用系统默认编码。当读取字段编码类型和系统编码不一致时会出现乱码
 
 **7.（2 分）** 缓冲流为什么必须 `flush()` 或 `close()`？`close()` 和 `flush()` 的关系是什么？
 
-> 答：
+> 答：因为缓存区里不满8kb的数据仍存在，不flush()或close()的话该部分数据会随流关闭消失。close()会先执行flush()再执行自身，通俗而言close()是flush()的父类
 
 **8.（2 分）** 对象序列化时，为什么 `transient` 字段读回来是 `null`？它和 `static` 不序列化的原因有何不同？
 
-> 答：
+> 答：因为transient字段不可被序列化，transient指定的对象字段不被读进文件里，因此读回来的值是默认值null，static是类不是对象，在类加载时已经存在，无法被new出来，因此序列化没意义
 
 **9.（2 分）** `Properties.load(InputStream)` 读中文为什么乱码？正确写法是什么？
 
-> 答：
+> 答：因为load(inputstream)默认编码样式是Latin1,因此解码时中文会乱码。
+>     正确写法是Properties.load(new InputStreamReader(new FileInputStream(f), StandardCharsets.UTF_8))
 
 **10.（2 分）** 你写了一个工具类 `FileUtils.readLines(File)`，方法内部抛 `IOException` 时你包装成了 `UncheckedIOException` 再抛出。这样做的好处和坏处各是什么？
 
-> 答：
+> 答：**优点**包装后出现异常时不用到处catch，真正实现工具类只调用的功能。
+>     **缺点**当程序出现编译异常的时候不会立马抛异常，通常往后的时间点才会抛，因此要显式catch业务异常(如businessexception)
 
 <details>
 <summary>参考答案（批改完再看）</summary>

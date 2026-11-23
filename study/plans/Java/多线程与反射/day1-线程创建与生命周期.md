@@ -297,10 +297,10 @@ public class MethodDemo {
 
 | 写法 | 执行 `run()` 的线程名 |
 | --- | --- |
-| 继承 Thread + `start()` | |
-| 实现 Runnable + `start()` | |
-| Lambda + `start()` | |
-| Callable + FutureTask | |
+| 继承 Thread + `start()` | main |
+| 实现 Runnable + `start()` | main |
+| Lambda + `start()` | Lambda |
+| Callable + FutureTask | main |
 
 ### B. 验证 `start()` 与 `run()` 的差别
 
@@ -320,23 +320,23 @@ public class MethodDemo {
 
 **A1.** 一个线程对象调用 `run()` 方法，就会启动一条新线程。
 
-> 答：
+> 答：错，在主线程执行该对象的run方法
 
 **A2.** `Thread.sleep(1000)` 会让当前线程暂停 1 秒，并释放它持有的锁。
 
-> 答：
+> 答：错，wait释放当前锁
 
 **A3.** 同一个 `Thread` 对象可以连续调用两次 `start()`。
 
-> 答：
+> 答：错，只能开启一次，不然会抛IllegalThreadStateException
 
 **A4.** `RUNNABLE` 状态包含"正在运行"和"已经就绪、等待 CPU"两种情况。
 
-> 答：
+> 答：对
 
 **A5.** 守护线程（daemon）会在主线程结束时被 JVM 强制结束。
 
-> 答：
+> 答：对
 
 ### B. 选择（5 题）
 
@@ -346,41 +346,41 @@ B. `new Thread(new Runnable(){ public void run(){} }).start()`
 C. `new Thread().run()`
 D. `new Thread(new FutureTask<>(() -> 1)).start()`
 
-> 答：
+> 答：C
 
 **B2.** `Callable` 相比 `Runnable` 多了什么能力？
 A. 能被 `Thread` 直接接收　B. 有返回值、能抛受检异常　C. 能自动加锁　D. 能设置优先级
 
-> 答：
+> 答：B
 
 **B3.** 调用 `t.interrupt()` 后，如果 `t` 正卡在 `Thread.sleep(10000)` 里，会发生什么？
 A. 线程立刻结束　B. 抛 `InterruptedException` 并清除中断标志　C. 什么都不发生　D. 线程进入 BLOCKED
 
-> 答：
+> 答：B
 
 **B4.** 下面哪个方法会让线程进入 `TIMED_WAITING`？
 A. `wait()`　B. `join()`（无参）　C. `sleep(1000)`　D. `start()`
 
-> 答：
+> 答：C
 
 **B5.** `setDaemon(true)` 必须在什么时候调用？
 A. 随时都可以　B. `start()` 之前　C. `run()` 内部　D. 线程结束后
 
-> 答：
+> 答：B
 
 ### C. 简答（3 题）
 
 **C1.** 用一句话说清 `start()` 和 `run()` 的区别，并说明"只调 `run()` 不调 `start()`"会有什么后果。
 
-> 答：
+> 答：start()会开一个新线程让run()在新线程里跑，run()直接在当前调用的线程上跑。会导致主线程任务堵塞，完全无法实现并发
 
 **C2.** 为什么实际开发中更推荐"实现 `Runnable`"而不是"继承 `Thread`"？至少说两点。
 
-> 答：
+> 答：因为java是单继承，继承了Thread就不能继承其他类了。线程池调度只接收runnable和callable。同一个runnable可以交给多条线程或线程池执行
 
 **C3.** `sleep()` 和 `wait()` 都会让线程等待，它们的区别是什么？（提示：从"锁"和"谁来唤醒"两个角度答）
 
-> 答：
+> 答：sleep()不释放锁，只能到时间后释放，无法被别人唤醒。wait()会释放锁，必须由别的线程唤醒，且在synchronized块里调用
 
 <details>
 <summary>参考答案</summary>

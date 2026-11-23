@@ -304,7 +304,7 @@ public class MethodDemo {
 
 ### B. 验证 `start()` 与 `run()` 的差别
 
-运行 `StartVsRunDemo`，确认直接调 `run()` 时打印的是 `main`。然后**故意**对同一个线程调用两次 `start()`，看抛什么异常，把异常名抄下来：\_\_\_\_\_\_\_\_\_\_。
+运行 `StartVsRunDemo`，确认直接调 `run()` 时打印的是 `main`。然后**故意**对同一个线程调用两次 `start()`，看抛什么异常，把异常名抄下来：\_\_\_\_\IllegalThreadStatesException_\_\_\_\_\_。
 
 ### C. 用 `join()` 保证顺序
 

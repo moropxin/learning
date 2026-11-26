@@ -386,8 +386,8 @@ public class TryLockDemo {
 
 | 问题 | 现象 |
 | --- | --- |
-| 换成 sleep 后，主线程能不能进 `synchronized (LOCK)` 块？ | |
-| 如果能/不能，为什么？ | |
+| 换成 sleep 后，主线程能不能进 `synchronized (LOCK)` 块？ | 不能 |
+| 如果能/不能，为什么？ | 因为sleep不释放锁，必须等sleep进程结束 |
 
 > 这一步就是"`wait` 释放锁、`sleep` 不释放"的物理证据。你昨天那道判断题，今天亲眼验证。
 
@@ -413,64 +413,67 @@ public class TryLockDemo {
 
 **A1.** `wait()` 和 `sleep()` 都会让线程暂停，两者都会释放锁。
 
-> 答：
+> 答：错，sleep不会让锁释放
 
 **A2.** `wait()` 必须在 `synchronized` 块里调用，否则抛 `IllegalMonitorStateException`。
 
-> 答：
+> 答：对
 
 **A3.** `notify()` 被调用后，等待的线程会立刻继续执行 `wait()` 之后的代码。
 
-> 答：
+> 答：对
 
 **A4.** `wait()` 应该包在 `while` 循环里，而不是 `if` 里。
 
-> 答：
+> 答：对，不然虚假唤醒会导致程序出错
 
 **A5.** `ReentrantLock` 的 `unlock()` 必须放在 `finally` 里。
 
-> 答：
+> 答：对，否则抛异常锁永远无法释放
 
 ### B. 选择（5 题）
 
 **B1.** 线程调用 `obj.wait()` 时，被释放的是：
 A. 所有锁　B. `obj` 这个对象上的监视器锁　C. CPU 时间片　D. 不需要释放
 
-> 答：
+> 答：B
 
 **B2.** 生产者-消费者里用 `notify()` 而不用 `notifyAll()`，可能造成的问题是：
 A. 死锁必然发生　B. 唤醒丢失（叫醒了不需要的线程）　C. 抛异常　D. 缓冲区溢出
 
-> 答：
+> 答：B
 
 **B3.** 下面哪个方法**不能**被中断（不会抛 `InterruptedException`）？
 A. `Thread.sleep()`　B. `Object.wait()`　C. `Condition.await()`　D. `synchronized` 获取锁
 
-> 答：
+> 答：D
 
 **B4.** `Condition` 相比 `wait/notify` 的最大优势是：
 A. 性能更高　B. 可以建多个等待队列精确唤醒　C. 不需要加锁　D. 自动释放锁
 
-> 答：
+> 答：B
 
 **B5.** `ReentrantLock(true)` 中的 `true` 表示：
 A. 可重入　B. 公平锁（按等待顺序获取）　C. 可中断　D. 超时
 
-> 答：
+> 答：B
 
 ### C. 简答（3 题）
 
 **C1.** 为什么 `wait()` 要释放锁，而 `sleep()` 不释放？从"如果不释放会怎样"的角度回答。
 
-> 答：
+> 答：wait的目的是等别的线程改变条件成立，如果不释放锁别的线程进不了同步块，条件永远不变。sleep只是等待一段时间，无需他人改变条件，所以不需要释放锁
 
 **C2.** 生产者-消费者代码里，生产者 `notifyAll()` 之后，消费者被唤醒。请描述消费者从"被唤醒"到"真正执行 `poll()`"之间经历了什么。
 
-> 答：
+> 答：N1.从waiting变为blocked，进入lock的等待队列抢锁
+>     N2.抢到锁后，从wait()调用处之后执行
+>     N3.回到while(buffer.isempty())重新判断（这就是为什么要写while的原因：被唤醒时缓冲区可能被其他消费者取空）
+>     N4.条件满足则poll()，否则继续await()
 
 **C3.** `synchronized` 和 `ReentrantLock` 各自适合什么场景？各说一个 `synchronized` 做不到、只有 `Lock` 能做的事。
 
-> 答：
+> 答：`synchronized`适合大多数简单场景，自动释放不会漏锁。 `ReentrantLock`适合需要超时放弃、可中断等待、多个条件队列的场景。
 
 <details>
 <summary>参考答案</summary>

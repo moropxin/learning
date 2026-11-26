@@ -421,7 +421,7 @@ public class TryLockDemo {
 
 **A3.** `notify()` 被调用后，等待的线程会立刻继续执行 `wait()` 之后的代码。
 
-> 答：对
+> 答：错，notify()只是把线程叫醒，要先变成blocked去抢锁，抢到了才继续
 
 **A4.** `wait()` 应该包在 `while` 循环里，而不是 `if` 里。
 
